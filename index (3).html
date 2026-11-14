@@ -1,0 +1,4220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>THE SILENT EXPLORERS — Their missions ended. Their discoveries live forever.</title>
+  <meta name="description" content="An interactive digital space museum preserving the history and scientific legacy of NASA's discarded and retired spacecraft across the Moon, Mars, and Deep Space." />
+
+  <!-- Editorial & Technical Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ==========================================================================
+       DESIGN TOKENS & PALETTE
+       Restrained, archival museum aesthetic. Strictly no neon, purple, or blobs.
+       ========================================================================== */
+    :root {
+      --bg-primary: #080D18;
+      --bg-secondary: #111927;
+      --bg-deep-blue: #15243A;
+      --bg-elevated: #162032;
+
+      --accent-lunar: #D8C59D;
+      --accent-mars: #B96D42;
+      --accent-deep: #7B9BB8;
+
+      --text-primary: #F1F1EC;
+      --text-secondary: #A6ADBA;
+      --text-muted: #747F91;
+
+      --border-subtle: rgba(241, 241, 236, 0.11);
+      --border-strong: rgba(241, 241, 236, 0.24);
+      --border-lunar: rgba(216, 197, 157, 0.35);
+      --border-mars: rgba(185, 109, 66, 0.4);
+      --border-deep: rgba(123, 155, 184, 0.35);
+
+      --font-display: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+
+      --nav-height: 72px;
+      --container-max: 1280px;
+      --reading-max: 68ch;
+      --transition-smooth: 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    /* ==========================================================================
+       RESET & BASE TYPOGRAPHY
+       ========================================================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+      height: auto;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button {
+      font-family: inherit;
+      cursor: pointer;
+      background: none;
+      border: none;
+      color: inherit;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--accent-lunar);
+      outline-offset: 3px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: var(--container-max);
+      margin: 0 auto;
+      padding: 0 clamp(1.25rem, 4vw, 3rem);
+    }
+
+    .mono-label {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    /* ==========================================================================
+       NAVIGATION BAR
+       ========================================================================== */
+    .site-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: var(--nav-height);
+      z-index: 100;
+      transition: background-color var(--transition-smooth), border-color var(--transition-smooth);
+      border-bottom: 1px solid transparent;
+      background: linear-gradient(to bottom, rgba(8, 13, 24, 0.85), rgba(8, 13, 24, 0));
+    }
+
+    .site-header.scrolled,
+    .site-header.solid-bg {
+      background: rgba(8, 13, 24, 0.96);
+      border-bottom-color: var(--border-subtle);
+      backdrop-filter: blur(8px);
+    }
+
+    .nav-inner {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand-link {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.05rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-mark {
+      width: 10px;
+      height: 10px;
+      border: 1.5px solid var(--accent-lunar);
+      transform: rotate(45deg);
+      display: inline-block;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2.25rem;
+      list-style: none;
+    }
+
+    .nav-link {
+      font-size: 0.9rem;
+      font-weight: 400;
+      color: var(--text-secondary);
+      transition: color 0.2s ease;
+      position: relative;
+      padding: 0.25rem 0;
+    }
+
+    .nav-link:hover,
+    .nav-link.active {
+      color: var(--text-primary);
+    }
+
+    .nav-link.active::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background-color: var(--accent-lunar);
+    }
+
+    .nav-cta {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.6rem 1.25rem;
+      border: 1px solid var(--accent-lunar);
+      color: var(--accent-lunar);
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+    .nav-cta:hover {
+      background-color: var(--accent-lunar);
+      color: var(--bg-primary);
+    }
+
+    .mobile-menu-btn {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      padding: 0.5rem;
+    }
+
+    .mobile-menu-btn span {
+      display: block;
+      width: 24px;
+      height: 1.5px;
+      background-color: var(--text-primary);
+      transition: transform 0.25s ease, opacity 0.25s ease;
+    }
+
+    /* ==========================================================================
+       VIEW MANAGEMENT
+       ========================================================================== */
+    main {
+      flex: 1;
+    }
+
+    .view-section {
+      display: none;
+      animation: fadeInView 0.45s ease forwards;
+    }
+
+    .view-section.active {
+      display: block;
+    }
+
+    @keyframes fadeInView {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ==========================================================================
+       IMAGE HANDLING & FALLBACK ARCHITECTURE
+       ========================================================================== */
+    .archive-figure {
+      position: relative;
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      overflow: hidden;
+    }
+
+    .archive-img-wrap {
+      position: relative;
+      width: 100%;
+      background-color: #0b111e;
+      overflow: hidden;
+    }
+
+    .archive-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease;
+    }
+
+    .archive-fallback {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 2rem;
+      min-height: 260px;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .archive-fallback.visible {
+      display: flex;
+    }
+
+    .archive-fallback-code {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--accent-lunar);
+      margin-bottom: 0.5rem;
+      letter-spacing: 0.08em;
+    }
+
+    .archive-fallback-title {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .archive-fallback-note {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      max-width: 45ch;
+    }
+
+    .archive-caption {
+      padding: 0.85rem 1.1rem;
+      background-color: var(--bg-secondary);
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .archive-caption-text {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .archive-caption-credit {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    .archive-caption-credit a {
+      color: var(--accent-lunar);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    /* ==========================================================================
+       HOME VIEW — HERO SECTION
+       ========================================================================== */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-end;
+      padding-top: var(--nav-height);
+      padding-bottom: clamp(3.5rem, 8vh, 6rem);
+      border-bottom: 1px solid var(--border-subtle);
+      overflow: hidden;
+    }
+
+    .hero-media {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+
+    .hero-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 35%;
+      filter: brightness(0.62) contrast(1.06);
+    }
+
+    .hero-scrim {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to top,
+        rgba(8, 13, 24, 0.97) 0%,
+        rgba(8, 13, 24, 0.68) 45%,
+        rgba(8, 13, 24, 0.35) 100%
+      );
+      z-index: 1;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+    }
+
+    .hero-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+      color: var(--accent-lunar);
+    }
+
+    .hero-kicker::before {
+      content: '';
+      width: 28px;
+      height: 1px;
+      background-color: var(--accent-lunar);
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.75rem, 7vw, 5.75rem);
+      font-weight: 700;
+      line-height: 1.02;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      max-width: 16ch;
+      margin-bottom: 1.25rem;
+    }
+
+    .hero-tagline {
+      font-family: var(--font-display);
+      font-size: clamp(1.2rem, 2.2vw, 1.65rem);
+      font-weight: 400;
+      color: var(--accent-lunar);
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-desc {
+      font-size: clamp(1rem, 1.2vw, 1.125rem);
+      color: var(--text-secondary);
+      max-width: 58ch;
+      margin-bottom: 2.5rem;
+      line-height: 1.7;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .btn-primary {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 1rem 1.85rem;
+      background-color: var(--text-primary);
+      color: var(--bg-primary);
+      font-weight: 500;
+      transition: background-color 0.25s ease, transform 0.2s ease;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--accent-lunar);
+    }
+
+    .btn-secondary {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 1rem 1.85rem;
+      border: 1px solid var(--border-strong);
+      color: var(--text-primary);
+      transition: border-color 0.25s ease, background-color 0.25s ease;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--text-primary);
+      background-color: rgba(241, 241, 236, 0.06);
+    }
+
+    .hero-footer-bar {
+      margin-top: 3.5rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .scroll-cue {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+    }
+
+    .scroll-line {
+      width: 1px;
+      height: 24px;
+      background-color: var(--accent-lunar);
+    }
+
+    /* ==========================================================================
+       HOME — EDITORIAL INTRODUCTION ("Not every explorer comes home.")
+       ========================================================================== */
+    .editorial-intro {
+      padding: clamp(5rem, 10vw, 8.5rem) 0;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .editorial-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.15fr;
+      gap: clamp(2.5rem, 6vw, 5.5rem);
+      align-items: center;
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 3.8vw, 3.1rem);
+      font-weight: 600;
+      line-height: 1.12;
+      letter-spacing: -0.015em;
+      margin-top: 0.75rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .editorial-body p {
+      color: var(--text-secondary);
+      font-size: 1.05rem;
+      line-height: 1.78;
+      margin-bottom: 1.35rem;
+      max-width: 56ch;
+    }
+
+    .editorial-body p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* ==========================================================================
+       HOME — THREE ENVIRONMENTS (Large Photographic Bands)
+       ========================================================================== */
+    .environments-section {
+      padding: clamp(5rem, 9vw, 7.5rem) 0;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .section-header-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 1.5rem;
+      margin-bottom: 3.5rem;
+    }
+
+    .environment-bands {
+      display: flex;
+      flex-direction: column;
+      gap: 2.5rem;
+    }
+
+    .env-band {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      transition: border-color 0.35s ease;
+    }
+
+    .env-band:hover {
+      border-color: var(--border-strong);
+    }
+
+    .env-band.reverse {
+      grid-template-columns: 1fr 1.2fr;
+    }
+
+    .env-band.reverse .env-band-media {
+      order: 2;
+    }
+
+    .env-band-media {
+      position: relative;
+      min-height: 360px;
+      background-color: #0b111e;
+      overflow: hidden;
+    }
+
+    .env-band-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .env-band:hover .env-band-media img {
+      transform: scale(1.03);
+    }
+
+    .env-band-content {
+      padding: clamp(2rem, 4.5vw, 3.75rem);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .env-tag-lunar { color: var(--accent-lunar); }
+    .env-tag-mars { color: var(--accent-mars); }
+    .env-tag-deep { color: var(--accent-deep); }
+
+    .env-band-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.65rem, 2.8vw, 2.35rem);
+      font-weight: 600;
+      margin: 0.65rem 0 1rem;
+      line-height: 1.15;
+    }
+
+    .env-band-desc {
+      color: var(--text-secondary);
+      font-size: 0.98rem;
+      line-height: 1.7;
+      margin-bottom: 2rem;
+      max-width: 48ch;
+    }
+
+    .env-link-btn {
+      align-self: flex-start;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding-bottom: 0.35rem;
+      border-bottom: 1px solid var(--border-strong);
+      transition: border-color 0.25s ease, color 0.25s ease;
+    }
+
+    .env-link-btn:hover {
+      color: var(--accent-lunar);
+      border-color: var(--accent-lunar);
+    }
+
+    /* ==========================================================================
+       HOME — FEATURED ARTIFACTS (Asymmetrical Museum Curated Layout)
+       ========================================================================== */
+    .featured-section {
+      padding: clamp(5rem, 9vw, 8rem) 0;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .featured-list {
+      display: flex;
+      flex-direction: column;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .featured-row {
+      display: grid;
+      grid-template-columns: 90px 260px 1fr auto;
+      gap: clamp(1.25rem, 3vw, 2.5rem);
+      align-items: center;
+      padding: 2rem 0;
+      border-bottom: 1px solid var(--border-subtle);
+      transition: background-color 0.25s ease;
+      text-align: left;
+      width: 100%;
+    }
+
+    .featured-row:hover {
+      background-color: rgba(21, 36, 58, 0.35);
+    }
+
+    .featured-index {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      padding-left: 0.5rem;
+    }
+
+    .featured-thumb {
+      width: 260px;
+      aspect-ratio: 16 / 10;
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      overflow: hidden;
+    }
+
+    .featured-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s ease;
+    }
+
+    .featured-row:hover .featured-thumb img {
+      transform: scale(1.04);
+    }
+
+    .featured-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .featured-dest {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .featured-name {
+      font-family: var(--font-display);
+      font-size: clamp(1.35rem, 2.2vw, 1.75rem);
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .featured-summary {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      max-width: 56ch;
+      line-height: 1.6;
+    }
+
+    .featured-action {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent-lunar);
+      padding-right: 0.75rem;
+      white-space: nowrap;
+    }
+
+    /* ==========================================================================
+       HOME — CLOSING SECTION
+       ========================================================================== */
+    .closing-banner {
+      padding: clamp(5.5rem, 11vw, 9rem) 0;
+      background: linear-gradient(to bottom, var(--bg-primary), var(--bg-secondary));
+      text-align: left;
+    }
+
+    .closing-inner {
+      max-width: 760px;
+    }
+
+    .closing-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.1rem, 4.2vw, 3.4rem);
+      font-weight: 600;
+      line-height: 1.12;
+      margin-bottom: 1.25rem;
+    }
+
+    .closing-text {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      margin-bottom: 2.25rem;
+      max-width: 56ch;
+    }
+
+    /* ==========================================================================
+       EXPLORE VIEW — DESTINATION SWITCHER & CURATED GALLERIES
+       ========================================================================== */
+    .explore-header {
+      padding-top: calc(var(--nav-height) + 4rem);
+      padding-bottom: 3rem;
+      border-bottom: 1px solid var(--border-subtle);
+      transition: background-color 0.5s ease;
+    }
+
+    .explore-header.theme-moon {
+      background: linear-gradient(to bottom, rgba(216, 197, 157, 0.08), var(--bg-primary));
+    }
+
+    .explore-header.theme-mars {
+      background: linear-gradient(to bottom, rgba(185, 109, 66, 0.11), var(--bg-primary));
+    }
+
+    .explore-header.theme-deep {
+      background: linear-gradient(to bottom, rgba(21, 36, 58, 0.65), var(--bg-primary));
+    }
+
+    .dest-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 2rem;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 1rem;
+    }
+
+    .dest-tab {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.75rem 1.5rem;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      transition: all 0.25s ease;
+    }
+
+    .dest-tab:hover {
+      border-color: var(--border-strong);
+      color: var(--text-primary);
+    }
+
+    .dest-tab.active[data-dest="moon"] {
+      background-color: var(--accent-lunar);
+      color: var(--bg-primary);
+      border-color: var(--accent-lunar);
+      font-weight: 500;
+    }
+
+    .dest-tab.active[data-dest="mars"] {
+      background-color: var(--accent-mars);
+      color: var(--text-primary);
+      border-color: var(--accent-mars);
+      font-weight: 500;
+    }
+
+    .dest-tab.active[data-dest="deep"] {
+      background-color: var(--bg-deep-blue);
+      color: var(--text-primary);
+      border-color: var(--accent-deep);
+      font-weight: 500;
+    }
+
+    .dest-intro-block {
+      padding: 3.5rem 0;
+      border-bottom: 1px solid var(--border-subtle);
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 3rem;
+      align-items: start;
+    }
+
+    .dest-intro-heading {
+      font-family: var(--font-display);
+      font-size: clamp(1.85rem, 3.2vw, 2.75rem);
+      font-weight: 600;
+      line-height: 1.12;
+      margin-top: 0.5rem;
+    }
+
+    .dest-intro-copy {
+      color: var(--text-secondary);
+      font-size: 1.05rem;
+      line-height: 1.75;
+    }
+
+    .artifacts-editorial-list {
+      padding: 3rem 0 6rem;
+      display: flex;
+      flex-direction: column;
+      gap: 4.5rem;
+    }
+
+    .artifact-showcase {
+      display: grid;
+      grid-template-columns: 1.05fr 1fr;
+      gap: clamp(2rem, 4.5vw, 4rem);
+      align-items: center;
+      padding-bottom: 4.5rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .artifact-showcase:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .artifact-showcase:nth-child(even) .artifact-showcase-media {
+      order: 2;
+    }
+
+    .artifact-showcase-media .archive-img-wrap {
+      aspect-ratio: 16 / 11;
+    }
+
+    .artifact-type-badge {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.3rem 0.7rem;
+      border: 1px solid var(--border-strong);
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+    }
+
+    .artifact-showcase-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.65rem, 2.8vw, 2.3rem);
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      line-height: 1.15;
+    }
+
+    .artifact-showcase-mission {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 1.25rem;
+    }
+
+    .artifact-showcase-desc {
+      color: var(--text-secondary);
+      font-size: 1rem;
+      line-height: 1.72;
+      margin-bottom: 1.5rem;
+    }
+
+    .artifact-status-line {
+      padding: 0.85rem 1rem;
+      background-color: var(--bg-secondary);
+      border-left: 2px solid var(--accent-lunar);
+      margin-bottom: 1.75rem;
+      font-size: 0.88rem;
+    }
+
+    .artifact-status-line.status-mars {
+      border-left-color: var(--accent-mars);
+    }
+
+    .artifact-status-line.status-deep {
+      border-left-color: var(--accent-deep);
+    }
+
+    .artifact-status-line strong {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-primary);
+      display: block;
+      margin-bottom: 0.2rem;
+    }
+
+    .artifact-status-line span {
+      color: var(--text-secondary);
+    }
+
+    /* ==========================================================================
+       INDIVIDUAL ARTIFACT STORYTELLING PAGE (6-CHAPTER DOCUMENTARY EXPERIENCE)
+       ========================================================================== */
+    .story-topbar {
+      position: sticky;
+      top: var(--nav-height);
+      z-index: 80;
+      background-color: rgba(8, 13, 24, 0.95);
+      border-bottom: 1px solid var(--border-subtle);
+      backdrop-filter: blur(8px);
+    }
+
+    .story-topbar-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding-top: 0.75rem;
+      padding-bottom: 0.75rem;
+      overflow-x: auto;
+    }
+
+    .back-btn {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent-lunar);
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .back-btn:hover {
+      text-decoration: underline;
+    }
+
+    .chapter-nav {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .chapter-pill {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0.35rem 0.65rem;
+      color: var(--text-muted);
+      border: 1px solid transparent;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+
+    .chapter-pill:hover,
+    .chapter-pill.active {
+      color: var(--text-primary);
+      border-color: var(--border-strong);
+      background-color: var(--bg-secondary);
+    }
+
+    .story-hero {
+      padding-top: calc(var(--nav-height) + 3.5rem);
+      padding-bottom: 4rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .story-hero-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.15fr;
+      gap: clamp(2rem, 5vw, 4.5rem);
+      align-items: center;
+    }
+
+    .story-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.25rem, 4.5vw, 3.8rem);
+      font-weight: 700;
+      line-height: 1.06;
+      letter-spacing: -0.02em;
+      margin: 0.75rem 0 1rem;
+    }
+
+    .story-subtitle {
+      font-size: 1.12rem;
+      color: var(--text-secondary);
+      line-height: 1.65;
+      margin-bottom: 2rem;
+    }
+
+    .story-quick-facts {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.25rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .quick-fact dt {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-bottom: 0.25rem;
+    }
+
+    .quick-fact dd {
+      font-size: 0.92rem;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .story-chapters-container {
+      padding: 4.5rem 0;
+    }
+
+    .story-chapter {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: clamp(2rem, 5vw, 5rem);
+      padding: 4rem 0;
+      border-bottom: 1px solid var(--border-subtle);
+      scroll-margin-top: 130px;
+    }
+
+    .story-chapter:first-child {
+      padding-top: 0;
+    }
+
+    .chapter-sidebar {
+      position: sticky;
+      top: 140px;
+      align-self: start;
+    }
+
+    .chapter-num {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent-lunar);
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .chapter-heading {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 600;
+      line-height: 1.2;
+      color: var(--text-primary);
+    }
+
+    .chapter-body {
+      max-width: var(--reading-max);
+    }
+
+    .chapter-body p {
+      font-size: 1.06rem;
+      line-height: 1.8;
+      color: var(--text-secondary);
+      margin-bottom: 1.4rem;
+    }
+
+    .chapter-body p:first-of-type {
+      color: var(--text-primary);
+      font-size: 1.12rem;
+    }
+
+    .chapter-fact-callout {
+      margin: 2rem 0;
+      padding: 1.35rem 1.5rem;
+      background-color: var(--bg-secondary);
+      border-left: 2px solid var(--accent-lunar);
+    }
+
+    .chapter-fact-callout .mono-label {
+      color: var(--accent-lunar);
+      display: block;
+      margin-bottom: 0.4rem;
+    }
+
+    .chapter-fact-callout p {
+      font-size: 0.95rem !important;
+      color: var(--text-secondary) !important;
+      margin-bottom: 0 !important;
+    }
+
+    .chapter-figure {
+      margin: 2.25rem 0;
+    }
+
+    .chapter-figure .archive-img-wrap {
+      aspect-ratio: 16 / 10;
+    }
+
+    /* Technical Dossier & Verified Sources at end of Artifact Story */
+    .dossier-section {
+      padding: 4.5rem 0 6rem;
+      background-color: var(--bg-secondary);
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .dossier-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 4rem;
+      margin-top: 2.5rem;
+    }
+
+    .spec-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .spec-table tr {
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .spec-table th {
+      text-align: left;
+      padding: 0.9rem 1rem 0.9rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      font-weight: 400;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      width: 36%;
+      vertical-align: top;
+    }
+
+    .spec-table td {
+      padding: 0.9rem 0;
+      font-size: 0.94rem;
+      color: var(--text-primary);
+      line-height: 1.55;
+    }
+
+    .sources-box {
+      padding: 2rem;
+      background-color: var(--bg-primary);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .sources-list {
+      list-style: none;
+      margin-top: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .sources-list li {
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 0.88rem;
+    }
+
+    .sources-list li:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .sources-list a {
+      color: var(--accent-lunar);
+      word-break: break-all;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      display: block;
+      margin-top: 0.25rem;
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+    }
+
+    .story-next-bar {
+      margin-top: 4rem;
+      padding-top: 2.5rem;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* ==========================================================================
+       TIMELINE VIEW
+       ========================================================================== */
+    .timeline-header {
+      padding-top: calc(var(--nav-height) + 4rem);
+      padding-bottom: 3rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .timeline-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 2rem;
+    }
+
+    .filter-btn {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.55rem 1.1rem;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      transition: all 0.2s ease;
+    }
+
+    .filter-btn:hover,
+    .filter-btn.active {
+      border-color: var(--accent-lunar);
+      color: var(--bg-primary);
+      background-color: var(--accent-lunar);
+    }
+
+    .timeline-track {
+      position: relative;
+      padding: 4rem 0 6rem;
+    }
+
+    .timeline-track::before {
+      content: '';
+      position: absolute;
+      top: 4rem;
+      bottom: 6rem;
+      left: 140px;
+      width: 1px;
+      background-color: var(--border-strong);
+    }
+
+    .timeline-item {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 3rem;
+      margin-bottom: 4rem;
+      position: relative;
+    }
+
+    .timeline-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .timeline-date-col {
+      text-align: right;
+      padding-right: 2rem;
+      position: relative;
+    }
+
+    .timeline-date-col::after {
+      content: '';
+      position: absolute;
+      right: -5px;
+      top: 6px;
+      width: 9px;
+      height: 9px;
+      background-color: var(--bg-primary);
+      border: 2px solid var(--accent-lunar);
+      border-radius: 50%;
+    }
+
+    .timeline-year {
+      font-family: var(--font-display);
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.1;
+    }
+
+    .timeline-exact-date {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    .timeline-card {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 2rem;
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      padding: 1.5rem;
+      align-items: center;
+    }
+
+    .timeline-thumb {
+      aspect-ratio: 16 / 10;
+      background-color: #0b111e;
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .timeline-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .timeline-body h3 {
+      font-family: var(--font-display);
+      font-size: 1.35rem;
+      margin: 0.35rem 0 0.65rem;
+    }
+
+    .timeline-body p {
+      font-size: 0.94rem;
+      color: var(--text-secondary);
+      line-height: 1.65;
+      margin-bottom: 1.1rem;
+    }
+
+    /* ==========================================================================
+       ABOUT, SOURCES & EXPLORER'S CHALLENGE (QUIZ)
+       ========================================================================== */
+    .about-header {
+      padding-top: calc(var(--nav-height) + 4rem);
+      padding-bottom: 3.5rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .about-grid {
+      padding: 4rem 0;
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 4rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .about-block h2 {
+      font-family: var(--font-display);
+      font-size: 1.75rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .about-block p {
+      color: var(--text-secondary);
+      margin-bottom: 1.2rem;
+      line-height: 1.75;
+    }
+
+    .disclaimer-panel {
+      padding: 1.75rem;
+      background-color: var(--bg-secondary);
+      border-left: 2px solid var(--accent-mars);
+      margin-top: 2rem;
+    }
+
+    .disclaimer-panel h3 {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent-mars);
+      margin-bottom: 0.6rem;
+    }
+
+    .disclaimer-panel p {
+      font-size: 0.9rem;
+      margin-bottom: 0;
+    }
+
+    /* Explorer's Challenge Section */
+    .quiz-section {
+      padding: 4.5rem 0 6rem;
+    }
+
+    .quiz-container {
+      margin-top: 2.5rem;
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      padding: clamp(1.75rem, 4vw, 3rem);
+      max-width: 860px;
+    }
+
+    .quiz-progress {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 2rem;
+    }
+
+    .quiz-question {
+      font-family: var(--font-display);
+      font-size: clamp(1.25rem, 2.2vw, 1.55rem);
+      font-weight: 500;
+      line-height: 1.35;
+      margin-bottom: 1.75rem;
+    }
+
+    .quiz-options {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .quiz-option {
+      text-align: left;
+      padding: 1rem 1.25rem;
+      border: 1px solid var(--border-strong);
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-size: 0.96rem;
+      transition: border-color 0.2s ease, background-color 0.2s ease;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.85rem;
+    }
+
+    .quiz-option:hover:not(:disabled) {
+      border-color: var(--accent-lunar);
+      background-color: rgba(216, 197, 157, 0.06);
+    }
+
+    .quiz-option.selected-correct {
+      border-color: #6b9e78;
+      background-color: rgba(107, 158, 120, 0.15);
+    }
+
+    .quiz-option.selected-wrong {
+      border-color: var(--accent-mars);
+      background-color: rgba(185, 109, 66, 0.16);
+    }
+
+    .quiz-option:disabled {
+      cursor: default;
+    }
+
+    .quiz-feedback {
+      padding: 1.25rem;
+      background-color: var(--bg-primary);
+      border-left: 2px solid var(--accent-lunar);
+      margin-bottom: 1.5rem;
+      font-size: 0.94rem;
+      color: var(--text-secondary);
+      display: none;
+    }
+
+    .quiz-feedback.visible {
+      display: block;
+    }
+
+    .master-sources-section {
+      padding: 4rem 0;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .master-sources-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .source-ref-item {
+      padding: 1.25rem;
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .source-ref-item h4 {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .source-ref-item a {
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      color: var(--accent-lunar);
+      word-break: break-all;
+      text-decoration: underline;
+    }
+
+    /* ==========================================================================
+       FOOTER
+       ========================================================================== */
+    .site-footer {
+      border-top: 1px solid var(--border-subtle);
+      background-color: #060a13;
+      padding: 3.5rem 0;
+      margin-top: auto;
+    }
+
+    .footer-inner {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 2rem;
+    }
+
+    .footer-brand {
+      font-family: var(--font-display);
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      font-size: 0.95rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .footer-note {
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      max-width: 52ch;
+    }
+
+    .footer-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.75rem;
+      font-size: 0.86rem;
+      color: var(--text-secondary);
+    }
+
+    .footer-nav button:hover {
+      color: var(--accent-lunar);
+    }
+
+    /* ==========================================================================
+       RESPONSIVE BREAKPOINTS
+       ========================================================================== */
+    @media (max-width: 1024px) {
+      .editorial-grid,
+      .dest-intro-block,
+      .story-hero-grid,
+      .dossier-grid,
+      .about-grid {
+        grid-template-columns: 1fr;
+        gap: 2.5rem;
+      }
+
+      .env-band,
+      .env-band.reverse {
+        grid-template-columns: 1fr;
+      }
+
+      .env-band.reverse .env-band-media {
+        order: 0;
+      }
+
+      .artifact-showcase {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+
+      .artifact-showcase:nth-child(even) .artifact-showcase-media {
+        order: 0;
+      }
+
+      .story-chapter {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+
+      .chapter-sidebar {
+        position: static;
+      }
+
+      .featured-row {
+        grid-template-columns: 50px 180px 1fr;
+      }
+
+      .featured-action {
+        grid-column: 3;
+        padding-top: 0.5rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+        position: fixed;
+        top: var(--nav-height);
+        left: 0;
+        right: 0;
+        background-color: rgba(8, 13, 24, 0.98);
+        border-bottom: 1px solid var(--border-subtle);
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1.75rem clamp(1.25rem, 4vw, 3rem);
+        gap: 1.25rem;
+      }
+
+      .nav-links.open {
+        display: flex;
+      }
+
+      .mobile-menu-btn {
+        display: flex;
+      }
+
+      .featured-row {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+
+      .featured-index {
+        padding-left: 0;
+      }
+
+      .featured-thumb {
+        width: 100%;
+      }
+
+      .featured-action {
+        grid-column: 1;
+      }
+
+      .timeline-track::before {
+        left: 14px;
+      }
+
+      .timeline-item {
+        grid-template-columns: 1fr;
+        padding-left: 2.25rem;
+        gap: 0.75rem;
+      }
+
+      .timeline-date-col {
+        text-align: left;
+        padding-right: 0;
+      }
+
+      .timeline-date-col::after {
+        left: -26px;
+        right: auto;
+      }
+
+      .timeline-card {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========================================================================
+       NAVIGATION
+       ======================================================================== -->
+  <header class="site-header" id="siteHeader">
+    <div class="container nav-inner">
+      <a href="#home" class="brand-link" data-nav="home" aria-label="The Silent Explorers Home">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>THE SILENT EXPLORERS</span>
+      </a>
+
+      <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle navigation menu" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <nav aria-label="Primary Navigation">
+        <ul class="nav-links" id="navLinks">
+          <li><a href="#home" class="nav-link active" data-nav="home">Home</a></li>
+          <li><a href="#explore" class="nav-link" data-nav="explore">Explore</a></li>
+          <li><a href="#timeline" class="nav-link" data-nav="timeline">Timeline</a></li>
+          <li><a href="#about" class="nav-link" data-nav="about">About &amp; Sources</a></li>
+          <li><button type="button" class="nav-cta" data-nav="explore">Explore</button></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="mainContent">
+
+    <!-- ======================================================================
+         VIEW 1: HOME — THE OPENING EXPERIENCE
+         ====================================================================== -->
+    <section id="view-home" class="view-section active" aria-label="Home">
+      <!-- Cinematic Hero -->
+      <div class="hero">
+        <div class="hero-media">
+          <img
+            src="https://images-assets.nasa.gov/image/as11-40-5903/as11-40-5903~medium.jpg"
+            alt="Apollo 11 astronaut Edwin Aldrin standing on the lunar surface near the Passive Seismic Experiment Package and Lunar Module Eagle at Tranquility Base"
+            onerror="this.style.display='none'"
+          />
+        </div>
+        <div class="hero-scrim"></div>
+
+        <div class="container hero-content">
+          <div class="hero-kicker mono-label">NASA Space Apps Challenge 2026 &middot; Digital Exhibition</div>
+          <h1 class="hero-title">THE SILENT EXPLORERS</h1>
+          <p class="hero-tagline">Their missions ended. Their discoveries live forever.</p>
+          <p class="hero-desc">
+            Across the Moon, Mars, and the distant reaches of space, machines once sent to explore the unknown remain long after their missions have ended. Their journeys changed what humanity knows about the universe. Their stories deserve to be remembered.
+          </p>
+
+          <div class="hero-actions">
+            <button type="button" class="btn-primary" data-nav="explore">Explore the Missions</button>
+            <button type="button" class="btn-secondary" data-story="opportunity">Discover Their Stories</button>
+          </div>
+
+          <div class="hero-footer-bar">
+            <div class="scroll-cue">
+              <span class="scroll-line" aria-hidden="true"></span>
+              <span>Scroll to enter the archive</span>
+            </div>
+            <div class="mono-label">NASA Photo ID: AS11-40-5903 &middot; Sea of Tranquility, July 20, 1969</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Editorial Introduction -->
+      <section class="editorial-intro" aria-labelledby="introHeading">
+        <div class="container editorial-grid">
+          <div class="editorial-body">
+            <span class="mono-label">Exhibition Premise</span>
+            <h2 class="section-title" id="introHeading">Not every explorer comes home.</h2>
+            <p>
+              In space exploration, return journeys are the rare exception. To land on another world, rove across ancient crater floors, or fly past the outer planets, spacecraft are built for one-way voyages across millions of kilometers.
+            </p>
+            <p>
+              When their batteries deplete, dust coats their solar arrays, or their propellants run dry, these machines stay where their work concluded. Some rest on the basalt plains of the Moon; others sit quietly in Martian valleys or drift outward on trajectories beyond the planets.
+            </p>
+            <p>
+              Rather than mere debris, each artifact is an instrument of human curiosity—preserving the exact place where a question about our solar system was answered.
+            </p>
+          </div>
+
+          <figure class="archive-figure">
+            <div class="archive-img-wrap" style="aspect-ratio: 4/3;">
+              <img
+                src="https://images-assets.nasa.gov/image/PIA17936/PIA17936~medium.jpg"
+                alt="NASA Mars Exploration Rover Opportunity self-portrait showing dust accumulation on its solar panels on the rim of Endeavour Crater"
+                loading="lazy"
+                onerror="handleImageError(this, 'PIA17936', 'Opportunity Rover on Endeavour Crater Rim', 'https://images.nasa.gov/details/PIA17936')"
+              />
+              <div class="archive-fallback">
+                <span class="archive-fallback-code">NASA ARCHIVE ASSET: PIA17936</span>
+                <span class="archive-fallback-title">Opportunity Rover on Endeavour Crater Rim</span>
+                <span class="archive-fallback-note">Archival image currently unavailable offline. View original at images.nasa.gov.</span>
+              </div>
+            </div>
+            <figcaption class="archive-caption">
+              <span class="archive-caption-text">NASA's Opportunity rover photographed its own dust-covered solar deck in 2014 after a decade on Mars—more than forty times its planned 90-sol mission.</span>
+              <span class="archive-caption-credit">
+                <span>Credit: NASA/JPL-Caltech/Cornell Univ./Arizona State Univ.</span>
+                <a href="https://images.nasa.gov/details/PIA17936" target="_blank" rel="noopener noreferrer">NASA Archive PIA17936</a>
+              </span>
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <!-- Three Environments -->
+      <section class="environments-section" aria-labelledby="envHeading">
+        <div class="container">
+          <div class="section-header-row">
+            <div>
+              <span class="mono-label">Three Frontiers</span>
+              <h2 class="section-title" id="envHeading" style="margin-bottom:0;">Where the Machines Remain</h2>
+            </div>
+            <p class="mono-label">Select an environment to inspect its artifacts</p>
+          </div>
+
+          <div class="environment-bands">
+            <!-- THE MOON -->
+            <article class="env-band">
+              <div class="env-band-media">
+                <img
+                  src="https://images-assets.nasa.gov/image/as17-137-21011/as17-137-21011~medium.jpg"
+                  alt="Apollo 17 Lunar Roving Vehicle parked on the Taurus-Littrow valley floor on the Moon"
+                  loading="lazy"
+                  onerror="handleImageError(this, 'AS17-137-21011', 'Apollo 17 Lunar Roving Vehicle at Taurus-Littrow', 'https://images.nasa.gov/details/as17-137-21011')"
+                />
+                <div class="archive-fallback">
+                  <span class="archive-fallback-code">NASA ARCHIVE ASSET: AS17-137-21011</span>
+                  <span class="archive-fallback-title">Apollo 17 Lunar Roving Vehicle</span>
+                  <span class="archive-fallback-note">Archival lunar photograph. Credit: NASA.</span>
+                </div>
+              </div>
+              <div class="env-band-content">
+                <span class="mono-label env-tag-lunar">01 &middot; Earth's Satellite</span>
+                <h3 class="env-band-title">THE MOON — Footprints That Remain</h3>
+                <p class="env-band-desc">
+                  From early robotic Surveyor landers that tested whether the lunar soil could support weight, to Apollo descent stages, electric rovers, and long-lived surface science stations left behind by astronauts.
+                </p>
+                <button type="button" class="env-link-btn" data-explore-dest="moon">
+                  <span>Enter Lunar Archive</span>
+                  <span aria-hidden="true">&rarr;</span>
+                </button>
+              </div>
+            </article>
+
+            <!-- MARS -->
+            <article class="env-band reverse">
+              <div class="env-band-media">
+                <img
+                  src="https://images-assets.nasa.gov/image/PIA01122/PIA01122~medium.jpg"
+                  alt="Sojourner rover inspecting the rock Yogi on the Ares Vallis floodplain of Mars in 1997"
+                  loading="lazy"
+                  onerror="handleImageError(this, 'PIA01122', 'Sojourner Rover at Ares Vallis, Mars', 'https://images.nasa.gov/details/PIA01122')"
+                />
+                <div class="archive-fallback">
+                  <span class="archive-fallback-code">NASA ARCHIVE ASSET: PIA01122</span>
+                  <span class="archive-fallback-title">Sojourner Rover at Ares Vallis</span>
+                  <span class="archive-fallback-note">Archival Mars Pathfinder photograph. Credit: NASA/JPL.</span>
+                </div>
+              </div>
+              <div class="env-band-content">
+                <span class="mono-label env-tag-mars">02 &middot; The Fourth Planet</span>
+                <h3 class="env-band-title">MARS — The Red Planet's Silent Machines</h3>
+                <p class="env-band-desc">
+                  Stationary Viking and InSight landers, pioneering wheeled rovers like Sojourner, Spirit, and Opportunity, and Ingenuity—the first aircraft to achieve powered, controlled flight on another planet.
+                </p>
+                <button type="button" class="env-link-btn" data-explore-dest="mars">
+                  <span>Enter Martian Archive</span>
+                  <span aria-hidden="true">&rarr;</span>
+                </button>
+              </div>
+            </article>
+
+            <!-- DEEP SPACE -->
+            <article class="env-band">
+              <div class="env-band-media">
+                <img
+                  src="https://images-assets.nasa.gov/image/PIA03152/PIA03152~medium.jpg"
+                  alt="NEAR Shoemaker spacecraft approach image of asteroid 433 Eros showing craters and boulders"
+                  loading="lazy"
+                  onerror="handleImageError(this, 'PIA03152', 'Asteroid 433 Eros Photographed by NEAR Shoemaker', 'https://images.nasa.gov/details/PIA03152')"
+                />
+                <div class="archive-fallback">
+                  <span class="archive-fallback-code">NASA ARCHIVE ASSET: PIA03152</span>
+                  <span class="archive-fallback-title">Asteroid 433 Eros</span>
+                  <span class="archive-fallback-note">Archival NEAR Shoemaker image. Credit: NASA/JHUAPL.</span>
+                </div>
+              </div>
+              <div class="env-band-content">
+                <span class="mono-label env-tag-deep">03 &middot; Asteroids &amp; Outer Solar System</span>
+                <h3 class="env-band-title">DEEP SPACE — Beyond the Known</h3>
+                <p class="env-band-desc">
+                  Spacecraft resting on an asteroid, orbiting dwarf planet Ceres, drifting in heliocentric orbit after discovering thousands of exoplanets, or coasting silently outward past the outer planets.
+                </p>
+                <button type="button" class="env-link-btn" data-explore-dest="deep">
+                  <span>Enter Deep Space Archive</span>
+                  <span aria-hidden="true">&rarr;</span>
+                </button>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- Featured Artifacts -->
+      <section class="featured-section" aria-labelledby="featuredHeading">
+        <div class="container">
+          <div class="section-header-row">
+            <div>
+              <span class="mono-label">Curated Selection</span>
+              <h2 class="section-title" id="featuredHeading" style="margin-bottom:0;">Six Defining Artifacts</h2>
+            </div>
+            <button type="button" class="btn-secondary" data-nav="explore">View All 15 Artifacts</button>
+          </div>
+
+          <div class="featured-list" id="featuredArtifactsList">
+            <!-- Populated dynamically from verified dataset -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Closing Banner -->
+      <section class="closing-banner" aria-labelledby="closingHeading">
+        <div class="container">
+          <div class="closing-inner">
+            <span class="mono-label" style="color: var(--accent-lunar); display:block; margin-bottom:0.75rem;">Preserving Exploration History</span>
+            <h2 class="closing-title" id="closingHeading">Every mission leaves something behind.</h2>
+            <p class="closing-text">
+              The machines may no longer be exploring, but the knowledge they helped uncover continues to shape our understanding of the universe.
+            </p>
+            <button type="button" class="btn-primary" data-nav="explore">Begin Your Exploration</button>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <!-- ======================================================================
+         VIEW 2: EXPLORE SECTION (MOON / MARS / DEEP SPACE)
+         ====================================================================== -->
+    <section id="view-explore" class="view-section" aria-label="Explore Destinations">
+      <div class="explore-header theme-moon" id="exploreHeader">
+        <div class="container">
+          <span class="mono-label">Digital Museum Archive</span>
+          <h1 class="section-title" style="margin-bottom:0.5rem;">Explore by Destination</h1>
+          <p style="color: var(--text-secondary); max-width: 60ch;">
+            Select a planetary environment to inspect the spacecraft, landers, rovers, and scientific instruments that completed their missions there.
+          </p>
+
+          <div class="dest-tabs" role="tablist" aria-label="Destination Environments">
+            <button type="button" role="tab" class="dest-tab active" data-dest="moon" aria-selected="true">01. The Moon</button>
+            <button type="button" role="tab" class="dest-tab" data-dest="mars" aria-selected="false">02. Mars</button>
+            <button type="button" role="tab" class="dest-tab" data-dest="deep" aria-selected="false">03. Deep Space</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="container">
+        <div class="dest-intro-block" id="destIntroBlock">
+          <!-- Dynamically populated -->
+        </div>
+
+        <div class="artifacts-editorial-list" id="exploreArtifactsList">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         VIEW 3: INDIVIDUAL ARTIFACT STORYTELLING PAGE (6 CHAPTERS)
+         ====================================================================== -->
+    <section id="view-story" class="view-section" aria-label="Artifact Documentary Story">
+      <div class="story-topbar">
+        <div class="container story-topbar-inner">
+          <button type="button" class="back-btn" id="storyBackBtn">&larr; Back to Archive</button>
+          <nav class="chapter-nav" aria-label="Story Chapters">
+            <a href="#chapter-1" class="chapter-pill">01 Beginning</a>
+            <a href="#chapter-2" class="chapter-pill">02 Journey</a>
+            <a href="#chapter-3" class="chapter-pill">03 Mission</a>
+            <a href="#chapter-4" class="chapter-pill">04 Discoveries</a>
+            <a href="#chapter-5" class="chapter-pill">05 Final Chapter</a>
+            <a href="#chapter-6" class="chapter-pill">06 Legacy</a>
+            <a href="#story-dossier" class="chapter-pill">Specs &amp; Sources</a>
+          </nav>
+        </div>
+      </div>
+
+      <div id="storyMount">
+        <!-- Dynamically rendered full 6-chapter story -->
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         VIEW 4: MISSION TIMELINE
+         ====================================================================== -->
+    <section id="view-timeline" class="view-section" aria-label="Historical Timeline">
+      <div class="timeline-header">
+        <div class="container">
+          <span class="mono-label">Chronological Record &middot; 1966 – 2024</span>
+          <h1 class="section-title">Evolution of Exploration Hardware</h1>
+          <p style="color: var(--text-secondary); max-width: 64ch;">
+            From the first soft-landing robotic probes on the Moon to autonomous aerial flight on Mars, trace how NASA's exploration machines evolved across six decades.
+          </p>
+
+          <div class="timeline-filters" role="group" aria-label="Filter timeline by destination">
+            <button type="button" class="filter-btn active" data-filter="all">All Missions</button>
+            <button type="button" class="filter-btn" data-filter="moon">The Moon</button>
+            <button type="button" class="filter-btn" data-filter="mars">Mars</button>
+            <button type="button" class="filter-btn" data-filter="deep">Deep Space</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="container">
+        <div class="timeline-track" id="timelineMount">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         VIEW 5: ABOUT, SOURCES & EXPLORER'S CHALLENGE
+         ====================================================================== -->
+    <section id="view-about" class="view-section" aria-label="About and Sources">
+      <div class="about-header">
+        <div class="container">
+          <span class="mono-label">2026 NASA Space Apps Challenge &middot; Abandoned but not Forgotten</span>
+          <h1 class="section-title">About THE SILENT EXPLORERS</h1>
+          <p style="color: var(--text-secondary); max-width: 64ch; font-size: 1.08rem;">
+            An independent educational digital museum dedicated to preserving the historical accuracy, engineering context, and scientific legacy of NASA's retired and non-returning spacecraft.
+          </p>
+        </div>
+      </div>
+
+      <div class="container">
+        <div class="about-grid">
+          <div class="about-block">
+            <h2>Purpose &amp; Editorial Philosophy</h2>
+            <p>
+              <strong>THE SILENT EXPLORERS</strong> was created for the 2026 NASA Space Apps Challenge theme <em>"Abandoned but not Forgotten: Storytelling about NASA's Discarded Equipment on the Moon and Mars."</em>
+            </p>
+            <p>
+              Designed for school-age students, educators, and space enthusiasts, this experience moves away from dry technical tables to tell the documentary story of why each machine was built, how it crossed space, what it discovered, and why it remains where it is today.
+            </p>
+            <p>
+              Every artifact entry distinguishes carefully between mission completion, intentional hardware staging, power depletion, dust accumulation, and ongoing orbital or deep-space trajectories.
+            </p>
+
+            <div class="disclaimer-panel">
+              <h3>Independence &amp; Non-Endorsement Notice</h3>
+              <p>
+                THE SILENT EXPLORERS is an independent educational project created for the 2026 NASA Space Apps Challenge. It is not an official NASA website, nor is it affiliated with, sponsored by, or endorsed by the National Aeronautics and Space Administration (NASA). All mission data and photographs are credited to their respective official NASA archives.
+              </p>
+            </div>
+          </div>
+
+          <div class="about-block">
+            <h2>Research &amp; Verification Methodology</h2>
+            <p>
+              All dates, launch vehicles, mission durations, scientific instruments, and operational statuses presented in this exhibition were cross-checked against official NASA mission pages and the NASA Space Science Data Coordinated Archive (NSSDCA).
+            </p>
+            <p>
+              <strong>Strict Factual Standards:</strong> No fictional spacecraft dialogue, unverified coordinates, invented quotes, or simulated live telemetry are used anywhere on this site. Where a mission involved multiple spacecraft (such as the seven Surveyor landers or six Apollo lunar landings), specific representative missions and verified program totals are explicitly distinguished.
+            </p>
+            <p>
+              <strong>Imagery Policy:</strong> All visual assets link directly to verified NASA Image and Video Library records (images.nasa.gov) with original NASA identification numbers and institutional credits.
+            </p>
+          </div>
+        </div>
+
+        <!-- Optional Educational Quiz -->
+        <div class="quiz-section" id="quizSection" aria-labelledby="quizHeading">
+          <span class="mono-label">Educational Self-Check</span>
+          <h2 class="section-title" id="quizHeading" style="margin-bottom:0.5rem;">The Explorer's Challenge</h2>
+          <p style="color: var(--text-secondary); max-width: 60ch;">
+            Test what you have learned from the exhibition archives. All six questions are drawn directly from verified mission records on this site.
+          </p>
+
+          <div class="quiz-container" id="quizContainer">
+            <!-- Dynamically rendered local quiz -->
+          </div>
+        </div>
+
+        <!-- Master Source Index -->
+        <div class="master-sources-section" aria-labelledby="sourcesHeading">
+          <span class="mono-label">Primary Archival References</span>
+          <h2 class="section-title" id="sourcesHeading">Official NASA Source Index</h2>
+          <p style="color: var(--text-secondary); max-width: 62ch;">
+            Visitors and students can explore the primary mission records directly through these official NASA portals:
+          </p>
+
+          <div class="master-sources-grid" id="masterSourcesGrid">
+            <!-- Populated from verified source directory -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================================================
+       FOOTER
+       ======================================================================== -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div>
+        <div class="footer-brand">THE SILENT EXPLORERS</div>
+        <p class="footer-note">
+          Their missions ended. Their discoveries live forever. &middot; An independent educational project for the 2026 NASA Space Apps Challenge. Historical data and imagery sourced from public NASA archives.
+        </p>
+      </div>
+
+      <div class="footer-nav">
+        <button type="button" data-nav="home">Home</button>
+        <button type="button" data-nav="explore">Explore</button>
+        <button type="button" data-nav="timeline">Timeline</button>
+        <button type="button" data-nav="about">About &amp; Sources</button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ========================================================================
+       APPLICATION DATA & ENGINE (SEPARATE DATA LAYER + RENDERING LOGIC)
+       ======================================================================== -->
+  <script>
+    "use strict";
+
+    /* ========================================================================
+       1. VERIFIED NASA SOURCE DIRECTORY
+       ======================================================================== */
+    const MASTER_SOURCES = [
+      {
+        title: "NASA Space Science Data Coordinated Archive (NSSDCA)",
+        url: "https://nssdc.gsfc.nasa.gov/"
+      },
+      {
+        title: "NASA Image and Video Library",
+        url: "https://images.nasa.gov/"
+      },
+      {
+        title: "Apollo 11 Lunar Module (Eagle) — NSSDCA",
+        url: "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1969-059C"
+      },
+      {
+        title: "Apollo 15 Lunar Roving Vehicle — NSSDCA",
+        url: "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1971-063C"
+      },
+      {
+        title: "Apollo 12 ALSEP Scientific Package — NSSDCA",
+        url: "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1969-099C"
+      },
+      {
+        title: "Surveyor 3 Mission Overview — NASA Science",
+        url: "https://science.nasa.gov/mission/surveyor-3/"
+      },
+      {
+        title: "Mars Pathfinder & Sojourner — NASA Science",
+        url: "https://science.nasa.gov/mission/mars-pathfinder/"
+      },
+      {
+        title: "Mars Exploration Rovers (Spirit & Opportunity) — NASA Science",
+        url: "https://science.nasa.gov/mission/mars-exploration-rovers-spirit-and-opportunity/"
+      },
+      {
+        title: "Viking 1 & Viking 2 — NASA Science",
+        url: "https://science.nasa.gov/mission/viking-1/"
+      },
+      {
+        title: "InSight Mars Lander — NASA Science",
+        url: "https://science.nasa.gov/mission/insight/"
+      },
+      {
+        title: "Ingenuity Mars Helicopter — NASA Science",
+        url: "https://science.nasa.gov/mission/mars-2020-perseverance/ingenuity-mars-helicopter/"
+      },
+      {
+        title: "Dawn Spacecraft — NASA Science",
+        url: "https://science.nasa.gov/mission/dawn/"
+      },
+      {
+        title: "NEAR Shoemaker — NASA Science",
+        url: "https://science.nasa.gov/mission/near-shoemaker/"
+      },
+      {
+        title: "Pioneer 10 & Pioneer 11 — NASA Science",
+        url: "https://science.nasa.gov/mission/pioneer-10/"
+      },
+      {
+        title: "Kepler Space Telescope — NASA Science",
+        url: "https://science.nasa.gov/mission/kepler/"
+      }
+    ];
+
+    /* ========================================================================
+       2. DESTINATION METADATA
+       ======================================================================== */
+    const DESTINATIONS = {
+      moon: {
+        id: "moon",
+        label: "The Moon",
+        heading: "FOOTPRINTS THAT REMAIN",
+        intro: "Before robotic explorers became common, humans travelled to the lunar surface and left behind machines, scientific instruments, and equipment that helped make lunar exploration possible. Each piece of hardware had a distinct operational fate: descent stages served as launch pads for returning crews, rovers were parked after completing geological traverses, and nuclear-powered instrument stations transmitted lunar data for years.",
+        themeClass: "theme-moon",
+        accentColor: "#D8C59D"
+      },
+      mars: {
+        id: "mars",
+        label: "Mars",
+        heading: "THE RED PLANET'S SILENT MACHINES",
+        intro: "Mars has been explored by numerous robotic missions. Some machines operated for only a short period, while others continued working far beyond their original expectations. Across ancient floodplains, volcanic plains, and polar latitudes, stationary landers, wheeled rovers, and an experimental rotorcraft remain on the surface after completing their scientific work.",
+        themeClass: "theme-mars",
+        accentColor: "#B96D42"
+      },
+      deep: {
+        id: "deep",
+        label: "Deep Space",
+        heading: "BEYOND THE KNOWN",
+        intro: "Not every abandoned explorer rests on a planetary surface. Some spacecraft continue moving through space on escape trajectories, some remain in stable orbit around distant worlds, and others completed their journeys by touching down on an asteroid or exhausting their maneuvering propellant in orbit around the Sun.",
+        themeClass: "theme-deep",
+        accentColor: "#7B9BB8"
+      }
+    };
+
+    /* ========================================================================
+       3. VERIFIED ARTIFACT DATABASE (15 ARTIFACTS ACROSS MOON, MARS, DEEP SPACE)
+       All facts cross-checked against NSSDCA & NASA Science mission portals.
+       ======================================================================== */
+    const ARTIFACTS = [
+      /* -------------------- THE MOON (4 ARTIFACTS) -------------------- */
+      {
+        id: "apollo-lm",
+        name: "Apollo Lunar Module Descent Stages",
+        shortName: "Apollo Lunar Modules",
+        destination: "moon",
+        destinationLabel: "The Moon",
+        category: "Crewed Lander Descent Stage",
+        featured: false,
+        timelineYear: 1969,
+        timelineDate: "July 20, 1969",
+        shortSummary: "Two-stage spacecraft built to carry astronauts from lunar orbit to the Moon's surface; six descent stages remain on the Moon as stationary launch platforms.",
+        statusCategory: "Intentionally Left Behind & Inactive",
+        currentStatusSummary: "Six descent stages (Apollos 11, 12, 14, 15, 16, and 17) remain intact and inactive at their respective lunar landing sites.",
+        heroImage: {
+          url: "https://images-assets.nasa.gov/image/as11-40-5927/as11-40-5927~medium.jpg",
+          nasaId: "AS11-40-5927",
+          title: "Apollo 11 Lunar Module Eagle on the Moon",
+          caption: "The Lunar Module Eagle photographed on the Sea of Tranquility during the Apollo 11 moonwalk on July 20, 1969.",
+          credit: "NASA",
+          sourceUrl: "https://images.nasa.gov/details/as11-40-5927"
+        },
+        secondaryImage: {
+          url: "https://images-assets.nasa.gov/image/as12-46-6729/as12-46-6729~medium.jpg",
+          nasaId: "AS12-46-6729",
+          title: "Apollo 12 Lunar Module Intrepid in Oceanus Procellarum",
+          caption: "Apollo 12's Lunar Module Intrepid resting on the Ocean of Storms in November 1969.",
+          credit: "NASA",
+          sourceUrl: "https://images.nasa.gov/details/as12-46-6729"
+        },
+        chapters: {
+          beginning: [
+            "To land astronauts on the Moon and bring them safely back to lunar orbit, NASA engineered a spacecraft unlike any flown before. Because the Moon has no atmosphere, parachutes and wings were useless; the vehicle had to descend entirely on rocket thrust.",
+            "Built by Grumman Aircraft Engineering Corporation, the Apollo Lunar Module (LM) was the first crewed spacecraft designed exclusively to operate in the vacuum of space. It consisted of two separable sections: a lower descent stage containing the landing gear, descent engine, propellant tanks, and scientific cargo bays, and an upper ascent stage housing the crew cabin and ascent engine."
+          ],
+          journey: [
+            "Each Lunar Module launched inside the Spacecraft-Lunar Module Adapter beneath the Apollo Command and Service Module atop a Saturn V rocket. During the three-day coast to the Moon, the Command Module pilot docked with the LM and extracted it from the spent S-IVB third stage.",
+            "On July 20, 1969, Apollo 11's Lunar Module Eagle separated from Command Module Columbia in lunar orbit and fired its descent engine. Guided manually past a boulder-strewn crater by Commander Neil Armstrong, Eagle touched down at Mare Tranquillitatis (the Sea of Tranquility)."
+          ],
+          mission: [
+            "While on the lunar surface, the Lunar Module served as the astronauts' home, life-support base, communications relay, and scientific storage bay. Its descent stage carried the Modularized Equipment Stowage Assembly (MESA), television cameras, geological sample containers, and surface experiment packages.",
+            "Across six successful landings between July 1969 and December 1972 (Apollos 11, 12, 14, 15, 16, and 17), Lunar Modules supported stays ranging from 21.5 hours on Apollo 11 to 75 hours on Apollo 17."
+          ],
+          discoveries: [
+            "By delivering twelve astronauts safely to diverse lunar regions—from smooth basaltic plains (maria) to ancient rugged highlands—the Lunar Modules enabled the collection of 382 kilograms (842 pounds) of lunar rocks, core tubes, and regolith.",
+            "Laboratory analysis of these samples revealed that the Moon is roughly 4.5 billion years old, shares an isotopic composition with Earth's mantle, and experienced an early magma ocean phase."
+          ],
+          finalChapter: [
+            "The descent stage was never meant to leave the Moon. When each crew prepared to depart, explosive bolts and guillotines severed the structural, electrical, and plumbing connections between the two halves.",
+            "Using the descent stage as a solid launch platform, the ascent stage fired its engine and lifted off back to lunar orbit. Scorched by the ascent exhaust, the descent stage remained behind on the lunar dust, its mission fulfilled."
+          ],
+          legacy: [
+            "Six Lunar Module descent stages stand quietly at their landing sites today, preserved in the airless lunar environment. Decades later, NASA's Lunar Reconnaissance Orbiter (LRO) photographed all six descent stages from orbit, showing their long shadows across the lunar surface."
+          ]
+        },
+        factHighlight: {
+          label: "Engineering Design",
+          text: "Separating the ascent stage from the descent stage allowed the returning spacecraft to leave behind heavy landing legs and empty descent propellant tanks, dramatically reducing the fuel needed to reach lunar orbit."
+        },
+        specs: {
+          officialName: "Apollo Lunar Module Descent Stages (LM-5 through LM-12)",
+          missionName: "Apollo Program (Apollos 11, 12, 14, 15, 16, 17)",
+          destination: "The Moon (Six landing sites)",
+          launchDate: "July 16, 1969 (Apollo 11) through December 7, 1972 (Apollo 17)",
+          landingDate: "July 20, 1969 (First landing — Apollo 11)",
+          missionDuration: "21 hours 36 minutes (Apollo 11 surface stay) to 75 hours (Apollo 17)",
+          objective: "Transport two astronauts from lunar orbit to the lunar surface, support surface EVAs, and serve as launch platform for ascent stage.",
+          instruments: "Descent Propulsion System, landing radar, Modularized Equipment Stowage Assembly (MESA), Laser Ranging Retroreflector (on specific missions).",
+          finalStatus: "Intentionally left on the lunar surface after ascent stage liftoff; inactive.",
+          lastLocation: "Mare Tranquillitatis, Oceanus Procellarum, Fra Mauro, Hadley-Apennine, Descartes Highlands, Taurus-Littrow."
+        },
+        sources: [
+          {
+            title: "NSSDCA Spacecraft Record: Apollo 11 Lunar Module (1969-059C)",
+            url: "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1969-059C"
+          },
+          {
+            title: "NASA Image Archive: Apollo 11 Lunar Module Eagle",
+            url: "https://images.nasa.gov/details/as11-40-5927"
+          }
+        ]
+      },
+
+      {
+        id: "lrv",
+        name: "Apollo Lunar Roving Vehicles (LRV)",
+        shortName: "Lunar Roving Vehicles",
+        destination: "moon",
+        destinationLabel: "The Moon",
+        category: "Crewed Electric Lunar Rover",
+        featured: true,
+        timelineYear: 1971,
+        timelineDate: "July 31, 1971",
+        shortSummary: "Battery-powered, four-wheel-drive electric vehicles folded into Apollo descent stages that expanded astronaut exploration from walking distance to tens of kilometers.",
+        statusCategory: "Intentionally Parked & Inactive",
+        currentStatusSummary: "Three Lunar Roving Vehicles remain parked at Hadley-Apennine (Apollo 15), Descartes (Apollo 16), and Taurus-Littrow (Apollo 17).",
+        heroImage: {
+          url: "https://images-assets.nasa.gov/image/as15-88-11901/as15-88-11901~medium.jpg",
+          nasaId: "AS15-88-11901",
+          title: "Apollo 15 Lunar Roving Vehicle at Hadley-Apennine",
+          caption: "Astronaut James Irwin stands beside the Apollo 15 Lunar Roving Vehicle with Mount Hadley Delta rising in the background, July 1971.",
+          credit: "NASA",
+          sourceUrl: "https://images.nasa.gov/details/as15-88-11901"
+        },
+        secondaryImage: {
+          url: "https://images-assets.nasa.gov/image/as17-137-21011/as17-137-21011~medium.jpg",
+          nasaId: "AS17-137-21011",
+          title: "Apollo 17 Lunar Roving Vehicle",
+          caption: "The third and final Lunar Roving Vehicle parked on the Taurus-Littrow valley floor during Apollo 17 in December 1972.",
+          credit: "NASA",
+          sourceUrl: "https://images.nasa.gov/details/as17-137-21011"
+        },
+        chapters: {
+          beginning: [
+            "During Apollos 11, 12, and 14, astronauts explored the Moon entirely on foot, constrained by the oxygen and cooling water carried in their backpacks. On Apollo 14, astronauts walked a little over 3 kilometers in total, unable to reach the rim of Cone Crater.",
+            "To unlock complex geological regions during the final three Apollo J-missions (Apollos 15, 16, and 17), NASA commissioned Boeing and Delco Electronics to build a lightweight, folding electric vehicle capable of carrying two astronauts, tools, cameras, and rock samples across rugged lunar terrain."
+          ],
+          journey: [
+            "Each Lunar Roving Vehicle had an Earth weight of 210 kilograms (463 pounds)—equivalent to just 35 kilograms in the Moon's one-sixth gravity—and folded neatly into Quadrant 1 of the Lunar Module descent stage.",
+            "On July 31, 1971, Apollo 15 astronauts David Scott and James Irwin deployed the first LRV using a system of pulleys, tapes, and torsion springs at the Hadley-Apennine site."
+          ],
+          mission: [
+            "Powered by two non-rechargeable 36-volt silver-zinc batteries, the LRV featured an independent electric motor on each of its four woven-wire mesh wheels, front and rear steering, and a dead-reckoning navigation system that continuously calculated distance and direction back to the Lunar Module.",
+            "Across the three missions, the rovers drove 27.9 km on Apollo 15, 26.7 km on Apollo 16, and 35.9 km on Apollo 17—traveling up to 7.6 km away from the safety of their landers."
+          ],
+          discoveries: [
+            "The mobility of the LRV transformed lunar field geology. On Apollo 15, astronauts drove along the rim of Hadley Rille and discovered the 'Genesis Rock' (sample 15415), an ancient anorthosite dating back over 4 billion years.",
+            "On Apollo 17, the rover carried astronauts Harrison Schmitt and Eugene Cernan to Shorty Crater, where they discovered distinctive orange volcanic glass beads formed by fire-fountain eruptions 3.64 billion years ago."
+          ],
+          finalChapter: [
+            "At the conclusion of each mission's final moonwalk, the crew parked the LRV roughly 100 meters east of the Lunar Module. This parking spot was chosen deliberately so the rover's ground-controlled television camera could film the ascent stage lifting off from the Moon.",
+            "Once the ascent stage cleared the surface, the rovers' silver-zinc batteries were soon exhausted. Their wire-mesh tires remain resting in the lunar regolith."
+          ],
+          legacy: [
+            "The Lunar Roving Vehicles proved that wheeled vehicles could traverse steep slopes, soft dust, and crater rims in extreme vacuum and temperature swings, directly informing the mobility engineering of later robotic planetary rovers."
+          ]
+        },
+        factHighlight: {
+          label: "Mobility Breakthrough",
+          text: "With the LRV, Apollo 15, 16, and 17 crews collected 285 kilograms of lunar samples—nearly three times the combined total of Apollos 11, 12, and 14."
+        },
+        specs: {
+          officialName: "Apollo Lunar Roving Vehicle (LRV-1, LRV-2, LRV-3)",
+          missionName: "Apollo 15, Apollo 16, and Apollo 17",
+          destination: "The Moon (Hadley-Apennine, Descartes, Taurus-Littrow)",
+          launchDate: "July 26, 1971 (Apollo 15); April 16, 1972 (Apollo 16); December 7, 1972 (Apollo 17)",
+          landingDate: "July 30, 1971 (LRV-1); April 21, 1972 (LRV-2); December 11, 1972 (LRV-3)",
+          missionDuration: "3 days of surface EVA operations per mission",
+          objective: "Provide surface mobility for astronauts, scientific equipment, and collected lunar samples.",
+          instruments: "Four 0.25-hp traction motors, dual 36V silver-zinc batteries, directional gyro & odometer navigation unit, Lunar Communications Relay Unit, color TV camera.",
+          finalStatus: "Intentionally parked after final EVAs; batteries depleted and inactive.",
+          lastLocation: "Hadley-Apennine (Apollo 15), Descartes Highlands (Apollo 16), Taurus-Littrow (Apollo 17)."
+        },
+        sources: [
+          {
+            title: "NSSDCA Spacecraft Record: Apollo 15 Lunar Roving Vehicle (1971-063C)",
+            url: "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1971-063C"
+          },
+          {
+            title: "NASA Image Archive: Apollo 15 Lunar Roving Vehicle",
+            url: "https://images.nasa.gov/details/as15-88-11901"
+          }
+        ]
+      },
+
+      {
+        id: "alsep",
+        name: "Apollo Lunar Surface Experiments Package (ALSEP)",
+        shortName: "ALSEP Scientific Packages",
+        destination: "moon",
+        destinationLabel: "The Moon",
+        category: "Autonomous Surface Geophysical Stations",
+        featured: false,
+        timelineYear: 1969,
+        timelineDate: "November 19, 1969",
+        shortSummary: "Nuclear-powered networks of seismometers, magnetometers, and solar wind sensors deployed by Apollo astronauts that transmitted lunar geophysical data until September 1977.",
+        statusCategory: "Intentionally Shut Down & Inactive",
+        currentStatusSummary: "Five ALSEP stations (Apollos 12, 14, 15, 16, 17) remain on the Moon; command transmissions were switched off on September 30, 1977.",
+        heroImage: {
+          url: "https://images-assets.nasa.gov/image/as12-47-6918/as12-47-6918~medium.jpg",
+          nasaId: "AS12-47-6918",
+          title: "Apollo 12 ALSEP Station Deployed on the Moon",
+          caption: "Astronaut Alan Bean standing near the deployed Apollo 12 ALSEP instruments and central station on November 19, 1969.",
+          credit: "NASA",
+          sourceUrl: "https://images.nasa.gov/details/as12-47-6918"
+        },
+        secondaryImage: {
+          url: "https://images-assets.nasa.gov/image/as16-113-18379/as16-113-18379~medium.jpg",
+          nasaId: "AS16-113-18379",
+          title: "Apollo 16 ALSEP Central Station",
+          caption: "Apollo 16 ALSEP central station and magnetometer deployed in the Descartes Highlands in April 1972.",
+          credit: "NASA",
+          sourceUrl: "https://images.nasa.gov/details/as16-113-18379"
+        },
+        chapters: {
+          beginning: [
+            "Bringing rocks back to Earth could reveal what the Moon was made of, but understanding the Moon's deep interior, seismic activity, magnetic environment, and tenuous atmosphere required instruments that could record data continuously long after the astronauts departed.",
+            "Following Apollo 11's short-lived solar-powered Early Apollo Scientific Experiments Package (EASEP), NASA deployed full-scale Apollo Lunar Surface Experiments Packages (ALSEP) on Apollos 12, 14, 15, 16, and 17."
+          ],
+          journey: [
+            "Each ALSEP was stowed in two subpackages inside the Lunar Module's scientific equipment bay. On the Moon, astronauts carried the equipment out using a barbell-like carrying bar, assembled the central communications station, and arrayed the sensors across the lunar soil.",
+            "To survive the 14-Earth-day lunar night—when temperatures plunge below minus 170 degrees Celsius—each station was powered by a SNAP-27 Radioisotope Thermoelectric Generator (RTG) fueled by plutonium-238."
+          ],
+          mission: [
+            "Connected to a central station that received Earth commands and transmitted telemetry, the five ALSEP sites operated simultaneously as the first multi-station geophysical network on another planetary body.",
+            "Instruments varied by mission and included passive and active seismometers, lunar surface magnetometers, solar wind spectrometers, suprathermal ion detectors, heat flow probes, and dust detectors."
+          ],
+          discoveries: [
+            "The ALSEP seismic network recorded more than 12,000 seismic events, identifying four distinct types of moonquakes: deep moonquakes caused by Earth's tidal pull, shallow moonquakes, thermal quakes triggered by sunrise warming, and meteoroid impacts.",
+            "By tracking how seismic waves traveled through the Moon, scientists determined the thickness of the lunar crust (roughly 34 to 43 kilometers) and demonstrated that the Moon possesses a small, dense core."
+          ],
+          finalChapter: [
+            "Designed for a one-year operational life, the nuclear-powered ALSEP stations continued returning data for up to eight years. By 1977, declining RTG power levels and budgetary priorities led NASA to terminate operations.",
+            "On September 30, 1977, ground controllers transmitted final commands shutting down the remaining ALSEP transmitters. The stations remain silently on the Moon."
+          ],
+          legacy: [
+            "The multi-terabyte seismic and magnetic dataset recorded by ALSEP remained humanity's sole direct measurement of another world's interior structure for more than four decades—until NASA's InSight lander placed a seismometer on Mars in 2018."
+          ]
+        },
+        factHighlight: {
+          label: "Multi-Station Seismic Network",
+          text: "Operating simultaneously across five Apollo landing sites from 1972 to 1977, ALSEP allowed seismologists to triangulate moonquake epicenters across the lunar globe."
+        },
+        specs: {
+          officialName: "Apollo Lunar Surface Experiments Package (ALSEP)",
+          missionName: "Apollo 12, 14, 15, 16, and 17",
+          destination: "The Moon (5 network stations)",
+          launchDate: "November 14, 1969 (First full ALSEP on Apollo 12)",
+          landingDate: "November 19, 1969 (Apollo 12 deployment)",
+          missionDuration: "Up to nearly 8 years (November 1969 – September 30, 1977)",
+          objective: "Establish a long-term automated geophysical network to measure lunar seismicity, interior heat flow, magnetic fields, and surface environment.",
+          instruments: "Passive & Active Seismic Experiments, Lunar Surface Magnetometer, Solar Wind Spectrometer, Heat Flow Experiment, Cold Cathode Ion Gauge, SNAP-27 RTG.",
+          finalStatus: "Intentionally shut down via ground command on September 30, 1977; remains on lunar surface.",
+          lastLocation: "Oceanus Procellarum, Fra Mauro, Hadley-Apennine, Descartes Highlands, Taurus-Littrow."
+        },
+        sources: [
+          {
+            title: "NSSDCA Spacecraft Record: Apollo 12 ALSEP (1969-099C)",
+            url: "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1969-099C"
+          },
+          {
+            title: "NASA Image Archive: Apollo 12 ALSEP Deployment",
+            url: "https://images.nasa.gov/details/as12-47-6918"
+          }
+        ]
+      },
+
+      {
+        id: "surveyor",
+        name: "Surveyor Robotic Lunar Landers (Surveyor 3)",
+        shortName: "Surveyor Landers",
+        destination: "moon",
+        destinationLabel: "The Moon",
+        category: "Robotic Soft-Landing Probe",
+        featured: false,
+        timelineYear: 1967,
+        timelineDate: "April 20, 1967",
+        shortSummary: "Uncrewed lunar landers that demonstrated soft-landing radar technology and tested lunar soil strength before Apollo; Surveyor 3 was later visited by Apollo 12 astronauts.",
+        statusCategory: "Mission Completed & Inactive",
+        currentStatusSummary: "Five successful Surveyor landers (Surveyors 1, 3, 5, 6, and 7) remain inactive on the Moon; Surveyor 3's camera was returned to Earth by Apollo 12.",
+        heroImage: {
+          url: "https://images-assets.nasa.gov/image/as12-48-7134/as12-48-7134~medium.jpg",
+          nasaId: "AS12-48-7134",
+          title: "Apollo 12 Astronaut Pete Conrad Inspecting Surveyor 3",
+          caption: "Apollo 12 Commander Charles 'Pete' Conrad examines the Surveyor 3 spacecraft on November 20, 1969, with Lunar Module Intrepid in the background.",
+          credit: "NASA",
+          sourceUrl: "https://images.nasa.gov/details/as12-48-7134"
+        },
+        secondaryImage: {
+          url: "https://images-assets.nasa.gov/image/67-H-614/67-H-614~medium.jpg",
+          nasaId: "67-H-614",
+          title: "Surveyor 3 Surface Sampler Trench on the Moon",
+          caption: "Trench dug in the lunar soil by Surveyor 3's soil mechanics surface sampler in April 1967.",
+          credit: "NASA",
+          sourceUrl: "https://images.nasa.gov/details/67-H-614"
+        },
+        chapters: {
+          beginning: [
+            "In the mid-1960s, before any human could attempt a lunar landing, NASA needed to answer a critical engineering question: was the Moon's surface firm enough to support a heavy spacecraft, or would a lander sink into a deep sea of loose dust?",
+            "Managed by the Jet Propulsion Laboratory (JPL) and built by Hughes Aircraft Company, the Surveyor program was designed to achieve America's first controlled soft landings on another celestial body and test the mechanical properties of lunar soil."
+          ],
+          journey: [
+            "Surveyor 3 launched from Cape Kennedy aboard an Atlas-Centaur rocket on April 17, 1967. After a 65-hour flight, its solid-fuel main retro-rocket and three throttleable vernier engines slowed the spacecraft for touchdown inside a small crater in Oceanus Procellarum on April 20, 1967.",
+            "Because rocks confused its landing radar at the final moment, Surveyor 3 bounced twice before coming to rest safely on the inner slope of the crater."
+          ],
+          mission: [
+            "Equipped with a survey television camera and an extendable pantograph scoop known as the Soil Mechanics Surface Sampler, Surveyor 3 transmitted 6,315 television images back to Earth.",
+            "Over two weeks of lunar daylight, ground controllers commanded the claw-like scoop to dig four trenches, perform bearing tests, and strike the lunar soil to measure its firmness and cohesion."
+          ],
+          discoveries: [
+            "Surveyor 3 confirmed that the lunar regolith had a bearing strength similar to damp terrestrial sand—capable of safely supporting an Apollo Lunar Module without sinking.",
+            "Across the five successful Surveyor missions (Surveyors 1, 3, 5, 6, and 7 between 1966 and 1968), the landers also performed the first on-site chemical analyses of lunar soil, revealing its basaltic composition."
+          ],
+          finalChapter: [
+            "Surveyor 3 ceased transmissions on May 3, 1967, at the onset of the frigid lunar night. Thirty-one months later, on November 19, 1969, Apollo 12 astronauts Pete Conrad and Alan Bean landed their Lunar Module Intrepid just 163 meters away.",
+            "During their second moonwalk, Conrad and Bean walked down into the crater, photographed Surveyor 3, and detached its television camera and soil scoop to bring back to Earth so engineers could study how spacecraft materials endured 31 months on the Moon."
+          ],
+          legacy: [
+            "Surveyor 3 holds a unique place in spaceflight history: the lander frame remains on the Moon in Oceanus Procellarum, while its returned television camera is preserved on Earth at the Smithsonian National Air and Space Museum."
+          ]
+        },
+        factHighlight: {
+          label: "Historic Rendezvous",
+          text: "Apollo 12's pinpoint landing next to Surveyor 3 in November 1969 proved NASA could land astronauts at pre-selected scientific targets rather than broad landing ellipses."
+        },
+        specs: {
+          officialName: "Surveyor 3 (Surveyor Program: Surveyors 1, 3, 5, 6, 7)",
+          missionName: "NASA Surveyor Program",
+          destination: "The Moon (Oceanus Procellarum)",
+          launchDate: "April 17, 1967 (Surveyor 3)",
+          landingDate: "April 20, 1967 (Surveyor 3)",
+          missionDuration: "14 Earth days of active surface operations (April 20 – May 3, 1967)",
+          objective: "Demonstrate soft-landing technology and evaluate lunar surface bearing strength and composition for Apollo.",
+          instruments: "Survey Television Camera, Soil Mechanics Surface Sampler (extendable claw), strain gauges, temperature sensors.",
+          finalStatus: "Mission completed in May 1967; lander structure remains on Moon (TV camera returned by Apollo 12).",
+          lastLocation: "Oceanus Procellarum (Mare Cognitum region), The Moon."
+        },
+        sources: [
+          {
+            title: "NASA Science Mission Page: Surveyor 3",
+            url: "https://science.nasa.gov/mission/surveyor-3/"
+          },
+          {
+            title: "NASA Image Archive: Pete Conrad & Surveyor 3",
+            url: "https://images.nasa.gov/details/as12-48-7134"
+          }
+        ]
+      },
+
+      /* -------------------- MARS (6 ARTIFACTS) -------------------- */
+      {
+        id: "viking",
+        name: "Viking 1 & Viking 2 Landers",
+        shortName: "Viking 1 & Viking 2",
+        destination: "mars",
+        destinationLabel: "Mars",
+        category: "Stationary Mars Landers",
+        featured: false,
+        timelineYear: 1976,
+        timelineDate: "July 20, 1976",
+        shortSummary: "The first spacecraft to successfully operate on the surface of Mars, transmitting the first color surface panoramas and conducting biological and chemical soil experiments.",
+        statusCategory: "Mission Completed / Loss of Communication",
+        currentStatusSummary: "Both landers remain stationary on Mars (Chryse Planitia and Utopia Planitia). Viking 2 shut down in April 1980; Viking 1 operated until November 1982.",
+        heroImage: {
+          url: "https://images-assets.nasa.gov/image/PIA00563/PIA00563~medium.jpg",
+          nasaId: "PIA00563",
+          title: "First Color Photograph from the Surface of Mars by Viking 1",
+          caption: "Transmitted on July 21, 1976, showing reddish iron-oxide soil and rocks across Chryse Planitia with a Viking footpad visible at lower right.",
+          credit: "NASA/JPL",
+          sourceUrl: "https://images.nasa.gov/details/PIA00563"
+        },
+        secondaryImage: {
+          url: "https://images-assets.nasa.gov/image/PIA00571/PIA00571~medium.jpg",
+          nasaId: "PIA00571",
+          title: "Viking 2 Lander at Utopia Planitia",
+          caption: "Boulder-strewn plain at Utopia Planitia photographed by the Viking 2 lander in September 1976.",
+          credit: "NASA/JPL",
+          sourceUrl: "https://images.nasa.gov/details/PIA00571"
+        },
+        chapters: {
+          beginning: [
+            "Before 1976, human knowledge of Mars came almost entirely from telescopes and brief orbital or flyby photographs. Whether the Martian surface was dusty, rocky, chemically reactive, or capable of supporting microbial life remained unknown.",
+            "NASA's Viking program sent two identical spacecraft—each pairing an orbiter with a nuclear-powered surface lander—to achieve the first sustained American landings on the Red Planet."
+          ],
+          journey: [
+            "Viking 1 launched on August 20, 1975, followed by Viking 2 on September 9, 1975, both lifted by Titan IIIE/Centaur rockets. After reaching Mars orbit in summer 1976, mission controllers spent weeks imaging candidate sites before clearing the landers for descent.",
+            "On July 20, 1976—seven years to the day after Apollo 11 landed on the Moon—Viking 1 touched down on Chryse Planitia. Viking 2 landed 6,460 kilometers away at Utopia Planitia on September 3, 1976."
+          ],
+          mission: [
+            "Powered by plutonium-238 Radioisotope Thermoelectric Generators (RTGs), each lander operated two facsimile cameras, a meteorology boom measuring wind speed, direction, temperature, and atmospheric pressure, a seismometer, and a robotic sampling arm.",
+            "The robotic arm scooped Martian soil into an onboard miniature biology laboratory and a Gas Chromatograph Mass Spectrometer (GCMS) to test for metabolic activity and organic molecules."
+          ],
+          discoveries: [
+            "Viking revealed a cold, dry desert world with reddish iron-rich dust, thin carbon dioxide atmosphere, seasonal pressure cycles, and winter frost at Utopia Planitia.",
+            "The biology experiments detected unexpected chemical reactivity in the Martian soil—later understood to be caused by oxidizing compounds such as perchlorates—while the GCMS found no definitive organic molecules at the landing sites."
+          ],
+          finalChapter: [
+            "Planned for 90-day primary missions, both landers operated for years. Viking 2 ceased communications on April 11, 1980, after its batteries failed.",
+            "Viking 1 continued sending weather reports until November 11, 1982, when an inadvertent command error sent from Earth during a battery-charging update caused its antenna to point away from Earth, ending contact after more than six years on Mars."
+          ],
+          legacy: [
+            "For two decades—until Mars Pathfinder arrived in 1997—everything humanity knew directly from the surface of Mars came from Viking 1 and Viking 2. In 1982, NASA formally renamed the Viking 1 lander the Thomas Mutch Memorial Station."
+          ]
+        },
+        factHighlight: {
+          label: "Endurance Record",
+          text: "Viking 1 operated on the Martian surface for 2,245 Martian sols (more than six Earth years), holding the surface longevity record on Mars until Opportunity surpassed it in 2010."
+        },
+        specs: {
+          officialName: "Viking 1 Lander (Thomas Mutch Memorial Station) & Viking 2 Lander",
+          missionName: "NASA Viking Program",
+          destination: "Mars (Chryse Planitia & Utopia Planitia)",
+          launchDate: "August 20, 1975 (Viking 1); September 9, 1975 (Viking 2)",
+          landingDate: "July 20, 1976 (Viking 1); September 3, 1976 (Viking 2)",
+          missionDuration: "Viking 1: 6 years, 116 days; Viking 2: 3 years, 221 days",
+          objective: "Obtain high-resolution surface imagery, characterize atmospheric and surface composition, and search for evidence of microbial life.",
+          instruments: "Two facsimile cameras, Biology Instrument (3 experiments), Gas Chromatograph Mass Spectrometer, X-Ray Fluorescence Spectrometer, Meteorology Boom, Seismometer.",
+          finalStatus: "Inactive on Mars. Viking 2 battery failure (April 11, 1980); Viking 1 communication lost after command error (November 11, 1982).",
+          lastLocation: "Chryse Planitia (Viking 1) and Utopia Planitia (Viking 2), Mars."
+        },
+        sources: [
+          {
+            title: "NASA Science Mission Page: Viking 1",
+            url: "https://science.nasa.gov/mission/viking-1/"
+          },
+          {
+            title: "NASA Image Archive: First Color Image from Mars (PIA00563)",
+            url: "https://images.nasa.gov/details/PIA00563"
+          }
+        ]
+      },
+
+      {
+        id: "sojourner",
+        name: "Sojourner Rover (Mars Pathfinder)",
+        shortName: "Sojourner",
+        destination: "mars",
+        destinationLabel: "Mars",
+        category: "Microrover (First Wheeled Rover on Another Planet)",
+        featured: true,
+        timelineYear: 1997,
+        timelineDate: "July 4, 1997",
+        shortSummary: "A 10.6-kilogram six-wheeled rover delivered by Mars Pathfinder that became the first wheeled vehicle to rove across another planet.",
+        statusCategory: "Mission Completed / Loss of Communication",
+        currentStatusSummary: "Resting inactive near the Carl Sagan Memorial Station in Ares Vallis, Mars; final data transmission occurred on September 27, 1997.",
+        heroImage: {
+          url: "https://images-assets.nasa.gov/image/PIA01122/PIA01122~medium.jpg",
+          nasaId: "PIA01122",
+          title: "Sojourner Rover Examining the Rock Yogi",
+          caption: "Sojourner places its Alpha Proton X-Ray Spectrometer against the Martian rock nicknamed 'Yogi' in July 1997.",
+          credit: "NASA/JPL",
+          sourceUrl: "https://images.nasa.gov/details/PIA01122"
+        },
+        secondaryImage: {
+          url: "https://images-assets.nasa.gov/image/PIA00701/PIA00701~medium.jpg",
+          nasaId: "PIA00701",
+          title: "Sojourner Driving Off the Mars Pathfinder Lander Ramp",
+          caption: "Sojourner rolls down the deployment ramp onto the soil of Ares Vallis on July 5, 1997 (Sol 2).",
+          credit: "NASA/JPL",
+          sourceUrl: "https://images.nasa.gov/details/PIA00701"
+        },
+        chapters: {
+          beginning: [
+            "After a 21-year gap following the Viking landings, NASA sought a faster, lower-cost approach to planetary exploration under its Discovery Program. The goal of Mars Pathfinder was to test a novel airbag landing system and deploy a small mobile robot capable of moving from rock to rock.",
+            "Named after abolitionist and women's rights advocate Sojourner Truth following a worldwide student essay contest, the microwave-oven-sized rover weighed just 10.6 kilograms (23 pounds)."
+          ],
+          journey: [
+            "Launched aboard a Delta II rocket on December 4, 1996, Mars Pathfinder flew directly into the Martian atmosphere on July 4, 1997. Slowed by a heat shield, supersonic parachute, and braking rockets, the spacecraft inflated giant airbags and bounced at least 15 times across Ares Vallis before coming to rest.",
+            "Once the lander's solar petals opened, Sojourner rolled down a deployment ramp onto Martian soil on July 5, 1997."
+          ],
+          mission: [
+            "Equipped with a six-wheeled rocker-bogie suspension system that allowed it to climb over obstacles larger than its 13-centimeter wheels, Sojourner communicated with Earth through the Pathfinder base station.",
+            "Over 83 Martian sols—nearly twelve times its planned 7-sol design life—Sojourner traveled just over 100 meters, remaining within 12 meters of the lander while inspecting 16 locations."
+          ],
+          discoveries: [
+            "Using its Alpha Proton X-Ray Spectrometer (APXS), Sojourner analyzed Martian rocks such as 'Barnacle Bill' and 'Yogi,' finding high silica concentrations resembling terrestrial andesite—evidence of complex volcanic and crustal processes.",
+            "Combined with Pathfinder's images of rounded pebbles and flood-sculpted terrain at Ares Vallis, the mission reinforced evidence that liquid water once flowed across ancient Mars."
+          ],
+          finalChapter: [
+            "As Martian winter approached and battery temperatures dropped, the Pathfinder lander transmitted its final signal on September 27, 1997. Without the base station to relay its radio signals to Earth, Sojourner could no longer communicate, though it had been programmed to continue circling the lander."
+          ],
+          legacy: [
+            "Sojourner's rocker-bogie suspension, autonomous hazard avoidance, and airbag entry architecture became the direct engineering foundation for Spirit, Opportunity, Curiosity, and Perseverance."
+          ]
+        },
+        factHighlight: {
+          label: "Rocker-Bogie Mobility",
+          text: "Sojourner introduced the six-wheeled articulated rocker-bogie suspension system, which keeps all six wheels in contact with uneven terrain without springs and has been used on every subsequent NASA Mars rover."
+        },
+        specs: {
+          officialName: "Sojourner Rover (Mars Pathfinder Microrover Flight Experiment)",
+          missionName: "Mars Pathfinder",
+          destination: "Mars (Ares Vallis)",
+          launchDate: "December 4, 1996",
+          landingDate: "July 4, 1997 (Rover egress: July 5, 1997)",
+          missionDuration: "83 sols (planned primary mission: 7 sols)",
+          objective: "Demonstrate low-cost entry, descent, and landing technology and operate a mobile robotic rover on Mars.",
+          instruments: "Alpha Proton X-Ray Spectrometer (APXS), three monochrome/color cameras, laser-striping hazard detection system, wheel abrasion experiment.",
+          finalStatus: "Mission completed; communication ended September 27, 1997 after base station battery depletion.",
+          lastLocation: "Ares Vallis (Carl Sagan Memorial Station), Mars."
+        },
+        sources: [
+          {
+            title: "NASA Science Mission Page: Mars Pathfinder & Sojourner",
+            url: "https://science.nasa.gov/mission/mars-pathfinder/"
+          },
+          {
+            title: "NASA Image Archive: Sojourner at Rock Yogi (PIA01122)",
+            url: "https://images.nasa.gov/details/PIA01122"
+          }
+        ]
+      },
+
+      {
+        id: "spirit",
+        name: "Spirit Rover (MER-A)",
+        shortName: "Spirit",
+        destination: "mars",
+        destinationLabel: "Mars",
+        category: "Mars Exploration Rover",
+        featured: false,
+        timelineYear: 2004,
+        timelineDate: "January 4, 2004",
+        shortSummary: "Twin to Opportunity, Spirit explored Gusev Crater for over six years, discovering silica-rich soils formed by ancient hydrothermal hot springs or volcanic steam.",
+        statusCategory: "Immobilized / Power Depletion",
+        currentStatusSummary: "Stationary at 'Troy' on the west side of Home Plate in Gusev Crater; final communication received on March 22, 2010.",
+        heroImage: {
+          url: "https://images-assets.nasa.gov/image/PIA04995/PIA04995~medium.jpg",
+          nasaId: "PIA04995",
+          title: "Spirit Rover Panoramic View of Gusev Crater",
+          caption: "First color mosaic captured by NASA's Spirit rover inside Gusev Crater shortly after landing in January 2004.",
+          credit: "NASA/JPL/Cornell",
+          sourceUrl: "https://images.nasa.gov/details/PIA04995"
+        },
+        secondaryImage: {
+          url: "https://images-assets.nasa.gov/image/PIA10214/PIA10214~medium.jpg",
+          nasaId: "PIA10214",
+          title: "Spirit Rover on the Edge of Home Plate",
+          caption: "View from Spirit's navigation camera looking across the layered volcanic feature known as Home Plate in Gusev Crater.",
+          credit: "NASA/JPL-Caltech",
+          sourceUrl: "https://images.nasa.gov/details/PIA10214"
+        },
+        chapters: {
+          beginning: [
+            "While orbital images showed river-like channels flowing into the 160-kilometer-wide Gusev Crater, scientists needed a robotic field geologist on the ground to search for chemical and mineral evidence of past liquid water.",
+            "Spirit (Mars Exploration Rover-A) was built as a 185-kilogram solar-powered mobile laboratory equipped with panoramic cameras, spectrometers, and a rock abrasion tool."
+          ],
+          journey: [
+            "Launched from Cape Canaveral on June 10, 2003, aboard a Delta II rocket, Spirit landed inside Gusev Crater on January 4, 2004, cushioned by an airbag cocoon similar to Mars Pathfinder's."
+          ],
+          mission: [
+            "Although Gusev's flat plain initially appeared dominated by volcanic basalt, Spirit drove more than 3 kilometers to reach the Columbia Hills. Even after its right-front wheel failed in 2006, drivers operated Spirit in reverse, dragging the stalled wheel like a trenching tool.",
+            "In total, Spirit drove 7.73 kilometers across Gusev Crater—more than twelve times its planned 600-meter goal."
+          ],
+          discoveries: [
+            "Dragging its immobile wheel uncovered a bright white patch of soil composed of nearly pure amorphous silica. On Earth, such deposits form in hot springs or volcanic steam vents—proving that Gusev Crater once hosted hydrothermal activity combining water and heat."
+          ],
+          finalChapter: [
+            "In May 2009, Spirit broke through a thin surface crust into soft sulfate sand at a site called 'Troy' beside Home Plate. Despite months of extrication attempts, the rover could not free itself before the Martian southern winter arrived.",
+            "Unable to tilt its solar panels toward the low winter sun, Spirit entered low-power hibernation. Its last communication reached Earth on March 22, 2010, and NASA concluded recovery efforts in May 2011."
+          ],
+          legacy: [
+            "Spirit demonstrated that ancient Mars possessed warm, water-rich hydrothermal environments capable of supporting microbial life, while proving how creative engineering could keep a damaged spacecraft productive for years."
+          ]
+        },
+        factHighlight: {
+          label: "Accidental Discovery",
+          text: "Spirit's failed right-front wheel scraped away the top layer of Martian dust in 2007, revealing 90-percent-pure silica—one of the mission's strongest pieces of evidence for ancient hot springs on Mars."
+        },
+        specs: {
+          officialName: "Spirit (Mars Exploration Rover-A / MER-2)",
+          missionName: "Mars Exploration Rovers",
+          destination: "Mars (Gusev Crater)",
+          launchDate: "June 10, 2003",
+          landingDate: "January 4, 2004",
+          missionDuration: "2,208 sols (last contact March 22, 2010; planned: 90 sols)",
+          objective: "Characterize rocks and soils in Gusev Crater to determine the history of water and habitability on Mars.",
+          instruments: "Pancam, Navcam, Mini-TES, Mössbauer Spectrometer, Alpha Particle X-Ray Spectrometer (APXS), Microscopic Imager, Rock Abrasion Tool (RAT).",
+          finalStatus: "Immobilized in soft sand at Troy; power depleted during Martian winter (last contact March 22, 2010).",
+          lastLocation: "West side of Home Plate, Columbia Hills, Gusev Crater, Mars."
+        },
+        sources: [
+          {
+            title: "NASA Science Mission Page: Mars Exploration Rovers (Spirit & Opportunity)",
+            url: "https://science.nasa.gov/mission/mars-exploration-rovers-spirit-and-opportunity/"
+          },
+          {
+            title: "NASA Image Archive: Spirit Gusev Crater Panorama (PIA04995)",
+            url: "https://images.nasa.gov/details/PIA04995"
+          }
+        ]
+      },
+
+      {
+        id: "opportunity",
+        name: "Opportunity Rover (MER-B)",
+        shortName: "Opportunity",
+        destination: "mars",
+        destinationLabel: "Mars",
+        category: "Mars Exploration Rover",
+        featured: true,
+        timelineYear: 2004,
+        timelineDate: "January 25, 2004",
+        shortSummary: "Designed for a 90-sol mission, Opportunity explored Meridiani Planum for nearly 15 years and drove 45.16 kilometers before a global dust storm ended contact in June 2018.",
+        statusCategory: "Lost Communication After Global Dust Storm",
+        currentStatusSummary: "Resting inactive in Perseverance Valley on the western rim of Endeavour Crater; last signal received June 10, 2018; mission concluded February 13, 2019.",
+        heroImage: {
+          url: "https://images-assets.nasa.gov/image/PIA17936/PIA17936~medium.jpg",
+          nasaId: "PIA17936",
+          title: "Opportunity Self-Portrait on Endeavour Crater Rim",
+          caption: "Opportunity's Pancam mosaic assembled in 2014 after seasonal Martian winds cleaned dust from its solar arrays.",
+          credit: "NASA/JPL-Caltech/Cornell Univ./Arizona State Univ.",
+          sourceUrl: "https://images.nasa.gov/details/PIA17936"
+        },
+        secondaryImage: {
+          url: "https://images-assets.nasa.gov/image/PIA05586/PIA05586~medium.jpg",
+          nasaId: "PIA05586",
+          title: "Hematite Spherules ('Blueberries') in Eagle Crater",
+          caption: "Microscopic Imager view of mineral concretions embedded in layered bedrock at Eagle Crater, photographed by Opportunity in 2004.",
+          credit: "NASA/JPL/Cornell/USGS",
+          sourceUrl: "https://images.nasa.gov/details/PIA05586"
+        },
+        chapters: {
+          beginning: [
+            "Orbital spectrometers had detected gray crystalline hematite—a mineral that typically forms in the presence of liquid water—on the flat plains of Meridiani Planum. Opportunity (Mars Exploration Rover-B) was built to land there and examine the bedrock firsthand.",
+            "Like its twin Spirit, Opportunity was engineered for a 90-sol (92.5-Earth-day) mission, with engineers expecting Martian dust to gradually coat its solar panels and end operations within months."
+          ],
+          journey: [
+            "Launched on July 7, 2003, aboard a Delta II Heavy rocket, Opportunity landed on January 25, 2004, rolling directly into a small, 22-meter-wide impact crater named Eagle Crater—a stroke of luck that immediately exposed layered bedrock right in front of the rover."
+          ],
+          mission: [
+            "Benefiting from seasonal Martian wind gusts that repeatedly swept dust off its solar panels, Opportunity continued operating across Eagle, Endurance, Victoria, and ultimately the 22-kilometer-wide Endeavour Crater.",
+            "Over 5,111 sols, Opportunity drove 45.16 kilometers (28.06 miles)—the longest distance driven by any vehicle on another celestial body."
+          ],
+          discoveries: [
+            "Within weeks of landing, Opportunity discovered millimeter-sized spheres of hematite ('blueberries') embedded in sulfate-rich sedimentary rock layers with cross-bedding ripples—conclusive proof that Meridiani Planum was once soaked by acidic liquid water.",
+            "Years later at Endeavour Crater's Matijevic Hill, Opportunity found clay minerals formed in neutral-pH water, pointing to an even more habitable ancient environment."
+          ],
+          finalChapter: [
+            "In late May 2018, a planet-encircling dust storm engulfed Meridiani Planum, blotting out sunlight so thoroughly that Opportunity's solar panels could no longer recharge its batteries.",
+            "Opportunity transmitted its final telemetry on June 10, 2018. After the skies cleared and engineers sent more than 835 recovery commands over eight months without a reply, NASA declared the mission complete on February 13, 2019."
+          ],
+          legacy: [
+            "Operating for nearly 15 Earth years—sixty times its planned lifespan—Opportunity established the geological proof of ancient surface water on Mars and set an enduring benchmark for robotic planetary exploration."
+          ]
+        },
+        factHighlight: {
+          label: "Off-World Distance Record",
+          text: "Opportunity's odometer reached 45.16 kilometers (28.06 miles), surpassing the Soviet Lunokhod 2 lunar rover's 39-kilometer record."
+        },
+        specs: {
+          officialName: "Opportunity (Mars Exploration Rover-B / MER-1)",
+          missionName: "Mars Exploration Rovers",
+          destination: "Mars (Meridiani Planum)",
+          launchDate: "July 7, 2003",
+          landingDate: "January 25, 2004",
+          missionDuration: "5,111 sols (14 years, 136 days active; mission ended February 13, 2019)",
+          objective: "Search for and characterize a wide range of rocks and soils that hold clues to past water activity on Mars.",
+          instruments: "Pancam, Navcam, Mini-TES, Mössbauer Spectrometer, Alpha Particle X-Ray Spectrometer (APXS), Microscopic Imager, Rock Abrasion Tool (RAT).",
+          finalStatus: "Inactive in Perseverance Valley; communication lost June 10, 2018 during global dust storm.",
+          lastLocation: "Perseverance Valley, western rim of Endeavour Crater, Meridiani Planum, Mars."
+        },
+        sources: [
+          {
+            title: "NASA Science Mission Page: Mars Exploration Rovers (Spirit & Opportunity)",
+            url: "https://science.nasa.gov/mission/mars-exploration-rovers-spirit-and-opportunity/"
+          },
+          {
+            title: "NASA Image Archive: Opportunity Self-Portrait (PIA17936)",
+            url: "https://images.nasa.gov/details/PIA17936"
+          }
+        ]
+      },
+
+      {
+        id: "insight",
+        name: "InSight Mars Lander",
+        shortName: "InSight",
+        destination: "mars",
+        destinationLabel: "Mars",
+        category: "Stationary Geophysical Lander",
+        featured: false,
+        timelineYear: 2018,
+        timelineDate: "November 26, 2018",
+        shortSummary: "A stationary geophysical lander at Elysium Planitia that placed the first seismometer directly onto Martian soil, detecting over 1,300 marsquakes and measuring Mars's core.",
+        statusCategory: "Power Depletion / Mission Concluded",
+        currentStatusSummary: "Stationary and inactive at Elysium Planitia; solar panels covered in dust; last communication received December 15, 2022.",
+        heroImage: {
+          url: "https://images-assets.nasa.gov/image/PIA22876/PIA22876~medium.jpg",
+          nasaId: "PIA22876",
+          title: "InSight Lander Self-Portrait on Elysium Planitia",
+          caption: "InSight's robotic arm camera mosaic showing its solar arrays and deck on Elysium Planitia in December 2018 before instrument deployment.",
+          credit: "NASA/JPL-Caltech",
+          sourceUrl: "https://images.nasa.gov/details/PIA22876"
+        },
+        secondaryImage: {
+          url: "https://images-assets.nasa.gov/image/PIA23302/PIA23302~medium.jpg",
+          nasaId: "PIA23302",
+          title: "SEIS Seismometer Deployed on the Surface of Mars",
+          caption: "InSight's ultra-sensitive seismometer resting beneath its wind and thermal shield on the Martian surface.",
+          credit: "NASA/JPL-Caltech",
+          sourceUrl: "https://images.nasa.gov/details/PIA23302"
+        },
+        chapters: {
+          beginning: [
+            "While rovers studied the surface geology of Mars, what lay deep beneath the crust—the thickness of the mantle, the size of the core, and whether Mars remained seismically active—could only be measured by listening to the planet's interior.",
+            "InSight (Interior Exploration using Seismic Investigations, Geodesy and Heat Transport) was designed as a stationary lander equipped with a robotic arm to place a dome-shielded seismometer directly onto the ground."
+          ],
+          journey: [
+            "Launched on May 5, 2018, from Vandenberg Air Force Base aboard an Atlas V rocket—the first interplanetary mission launched from California—InSight touched down smoothly on the flat volcanic plain of Elysium Planitia on November 26, 2018."
+          ],
+          mission: [
+            "In December 2018, InSight became the first spacecraft to use a robotic arm to lift a seismometer (SEIS) off its deck and set it directly onto another planet's surface, later covering it with a wind and thermal shield.",
+            "Alongside SEIS, InSight operated the RISE radio science experiment to track subtle wobbles in Mars's rotation axis, plus meteorological sensors."
+          ],
+          discoveries: [
+            "Over four years, InSight detected 1,319 marsquakes—including quakes caused by tectonic stress and fresh meteoroid impacts—proving that Mars is seismically active.",
+            "Seismic wave measurements revealed that Mars has a crust 24 to 72 kilometers thick and a liquid iron-alloy core larger and less dense than previously modeled, enriched with lighter elements such as sulfur and oxygen."
+          ],
+          finalChapter: [
+            "Because Elysium Planitia lacked strong cleaning winds, fine Martian dust steadily accumulated on InSight's two circular solar arrays, reducing daily electrical output.",
+            "InSight transmitted its final signal—and a final image of its dust-blanketed deck—on December 15, 2022. After two consecutive missed communication sessions, NASA formally retired the mission on December 21, 2022."
+          ],
+          legacy: [
+            "InSight provided humanity's first direct seismic profile of a terrestrial planet beyond Earth and the Moon, establishing a baseline for understanding how rocky planets form and cool."
+          ]
+        },
+        factHighlight: {
+          label: "Planetary Seismology",
+          text: "InSight's seismometer was sensitive enough to detect ground vibrations smaller than the diameter of a hydrogen atom, capturing both marsquakes and seismic waves from meteoroid impacts."
+        },
+        specs: {
+          officialName: "InSight (Interior Exploration using Seismic Investigations, Geodesy and Heat Transport)",
+          missionName: "NASA Discovery Program — InSight",
+          destination: "Mars (Elysium Planitia)",
+          launchDate: "May 5, 2018",
+          landingDate: "November 26, 2018",
+          missionDuration: "1,440 sols (4 years, 19 days active; retired December 21, 2022)",
+          objective: "Measure Mars's internal structure, crustal thickness, core size, and present-day seismic activity.",
+          instruments: "Seismic Experiment for Interior Structure (SEIS), Heat Flow and Physical Properties Package (HP3), Rotation and Interior Structure Experiment (RISE), APSS weather sensors.",
+          finalStatus: "Inactive on Elysium Planitia; solar array dust accumulation depleted power (last contact December 15, 2022).",
+          lastLocation: "Elysium Planitia, Mars."
+        },
+        sources: [
+          {
+            title: "NASA Science Mission Page: InSight",
+            url: "https://science.nasa.gov/mission/insight/"
+          },
+          {
+            title: "NASA Image Archive: InSight Self-Portrait (PIA22876)",
+            url: "https://images.nasa.gov/details/PIA22876"
+          }
+        ]
+      },
+
+      {
+        id: "ingenuity",
+        name: "Ingenuity Mars Helicopter",
+        shortName: "Ingenuity",
+        destination: "mars",
+        destinationLabel: "Mars",
+        category: "Autonomous Planetary Rotorcraft",
+        featured: true,
+        timelineYear: 2021,
+        timelineDate: "April 19, 2021",
+        shortSummary: "A 1.8-kilogram solar-powered helicopter that achieved the first powered, controlled flight on another planet, completing 72 flights across Jezero Crater before rotor blade damage ended flight operations in January 2024.",
+        statusCategory: "Flight Operations Ended / Stationary",
+        currentStatusSummary: "Resting stationary at 'Valinor Hills' in Jezero Crater after sustaining rotor blade damage on Flight 72 (January 18, 2024); flight mission concluded January 25, 2024.",
+        heroImage: {
+          url: "https://images-assets.nasa.gov/image/PIA24647/PIA24647~medium.jpg",
+          nasaId: "PIA24647",
+          title: "Ingenuity Hovering Above Jezero Crater During Flight 1",
+          caption: "Photographed by the Perseverance rover on April 19, 2021, as Ingenuity hovers 3 meters above Wright Brothers Field on Mars.",
+          credit: "NASA/JPL-Caltech/ASU/MSSS",
+          sourceUrl: "https://images.nasa.gov/details/PIA24647"
+        },
+        secondaryImage: {
+          url: "https://images-assets.nasa.gov/image/PIA24379/PIA24379~medium.jpg",
+          nasaId: "PIA24379",
+          title: "Ingenuity Deployed on the Surface of Jezero Crater",
+          caption: "Ingenuity standing on its four carbon-fiber legs after being deployed from the belly of Perseverance in April 2021.",
+          credit: "NASA/JPL-Caltech/MSSS",
+          sourceUrl: "https://images.nasa.gov/details/PIA24379"
+        },
+        chapters: {
+          beginning: [
+            "Flying on Mars presents an extreme aerodynamic challenge: the Martian atmosphere at the surface has only about 1 percent the density of Earth's atmosphere—equivalent to flying at an altitude of more than 30 kilometers on Earth.",
+            "Built by JPL as a high-risk technology demonstration, Ingenuity weighed just 1.8 kilograms (4 pounds) and used two counter-rotating 1.2-meter carbon-fiber rotors spinning at roughly 2,537 revolutions per minute to generate lift."
+          ],
+          journey: [
+            "Attached beneath the chassis of the Perseverance rover, Ingenuity launched on July 30, 2020, and landed in Jezero Crater on February 18, 2021. On April 3, 2021, Perseverance unfolded and dropped Ingenuity onto the airfield."
+          ],
+          mission: [
+            "On April 19, 2021, Ingenuity climbed to 3 meters, hovered for 39.1 seconds, and landed safely—achieving the first powered, controlled flight by an aircraft on another planet. In tribute, NASA named the site Wright Brothers Field.",
+            "Originally planned for up to five test flights over 30 sols, Ingenuity transitioned into an operational aerial scout for Perseverance, completing 72 flights, flying more than 17 kilometers horizontally, and reaching altitudes up to 24 meters."
+          ],
+          discoveries: [
+            "Ingenuity proved that powered aerial flight is practical in Mars's thin atmosphere. Its high-resolution color camera scouted ahead of Perseverance, identifying rocky hazards, sand ripples, and intriguing geological outcrops from above."
+          ],
+          finalChapter: [
+            "During Flight 72 on January 18, 2024, Ingenuity made an emergency landing over featureless sand ripples in Neretva Vallis that gave its visual navigation system few surface features to track.",
+            "Subsequent imagery confirmed that one or more of its carbon-fiber rotor blades sustained damage during touchdown, leaving the helicopter unable to fly again. NASA officially concluded Ingenuity's mission on January 25, 2024."
+          ],
+          legacy: [
+            "Ingenuity opened an aerial dimension for planetary science, directly inspiring the design of larger multi-rotor helicopters for future Mars exploration."
+          ]
+        },
+        factHighlight: {
+          label: "Wright Brothers Tribute",
+          text: "Ingenuity carried a postage-stamp-sized swatch of muslin fabric from the wing of the Wright brothers' 1903 Wright Flyer beneath its solar panel."
+        },
+        specs: {
+          officialName: "Ingenuity Mars Helicopter",
+          missionName: "Mars 2020 Perseverance Mission (Technology Demonstration)",
+          destination: "Mars (Jezero Crater)",
+          launchDate: "July 30, 2020",
+          landingDate: "February 18, 2021 (Deployed to surface: April 3, 2021; First flight: April 19, 2021)",
+          missionDuration: "Nearly 3 years (72 flights across 1,000+ Martian sols; concluded January 25, 2024)",
+          objective: "Demonstrate powered, controlled flight in the thin Martian atmosphere.",
+          instruments: "1.2-meter coaxial carbon-fiber rotors, solar panel, lithium-ion batteries, downward navigation camera, 13-megapixel color horizon camera.",
+          finalStatus: "Grounded with rotor blade damage after Flight 72 (January 18, 2024); flight operations ended.",
+          lastLocation: "Valinor Hills (Neretva Vallis region), Jezero Crater, Mars."
+        },
+        sources: [
+          {
+            title: "NASA Science Mission Page: Ingenuity Mars Helicopter",
+            url: "https://science.nasa.gov/mission/mars-2020-perseverance/ingenuity-mars-helicopter/"
+          },
+          {
+            title: "NASA Image Archive: Ingenuity First Flight (PIA24647)",
+            url: "https://images.nasa.gov/details/PIA24647"
+          }
+        ]
+      },
+
+      /* -------------------- DEEP SPACE (5 ARTIFACTS) -------------------- */
+      {
+        id: "pioneer-10",
+        name: "Pioneer 10",
+        shortName: "Pioneer 10",
+        destination: "deep",
+        destinationLabel: "Deep Space",
+        category: "Outer Planet Flyby & Escape Spacecraft",
+        featured: true,
+        timelineYear: 1972,
+        timelineDate: "March 2, 1972",
+        shortSummary: "The first spacecraft to traverse the asteroid belt, fly past Jupiter, and achieve solar system escape velocity; last weak signal received in January 2003.",
+        statusCategory: "Inactive & Coasting Outward",
+        currentStatusSummary: "Inactive and unpowered on a solar system escape trajectory toward the constellation Taurus; final telemetry signal received January 23, 2003.",
+        heroImage: {
+          url: "https://images-assets.nasa.gov/image/PIA00452/PIA00452~medium.jpg",
+          nasaId: "PIA00452",
+          title: "Jupiter and Io Photographed by Pioneer 10",
+          caption: "Close-up view of Jupiter's Great Red Spot and moon Io captured by Pioneer 10 during its December 1973 flyby.",
+          credit: "NASA/ARC",
+          sourceUrl: "https://images.nasa.gov/details/PIA00452"
+        },
+        secondaryImage: {
+          url: "https://images-assets.nasa.gov/image/72-H-196/72-H-196~medium.jpg",
+          nasaId: "72-H-196",
+          title: "Pioneer 10 Spacecraft During Pre-Launch Testing",
+          caption: "Technicians inspect Pioneer 10 and its 2.74-meter high-gain dish antenna prior to its March 1972 launch.",
+          credit: "NASA",
+          sourceUrl: "https://images.nasa.gov/details/72-H-196"
+        },
+        chapters: {
+          beginning: [
+            "In the early 1970s, no spacecraft had ever traveled beyond the orbit of Mars. Engineers did not know whether the main asteroid belt between Mars and Jupiter was densely packed with debris that would destroy a probe, or whether Jupiter's intense radiation belts would fry spacecraft electronics.",
+            "Managed by NASA Ames Research Center, Pioneer 10 was built as a spin-stabilized scout powered by four SNAP-19 Radioisotope Thermoelectric Generators to pave the way for outer solar system exploration."
+          ],
+          journey: [
+            "Launched on March 2, 1972, atop an Atlas-Centaur rocket with a solid third stage, Pioneer 10 reached a record speed of over 51,600 km/h—fast enough to pass the Moon's orbit in just 11 hours.",
+            "Between July 1972 and February 1973, Pioneer 10 successfully navigated the asteroid belt, and on December 3, 1973, it flew within 132,252 kilometers of Jupiter's cloud tops."
+          ],
+          mission: [
+            "During its Jupiter encounter, Pioneer 10 returned the first close-up images of the gas giant and its Great Red Spot, mapped its fierce trapped radiation belts, and measured its magnetic field and atmospheric temperature.",
+            "Following the Jupiter gravity assist, Pioneer 10 became the first human-made object placed on a trajectory that would escape the Sun's gravitational pull."
+          ],
+          discoveries: [
+            "Pioneer 10 proved that the asteroid belt could be safely traversed and revealed that Jupiter's magnetosphere is immense—extending millions of kilometers into space and pulsing with trapped high-energy particles.",
+            "On June 13, 1983, Pioneer 10 crossed the orbit of Neptune, then the outermost planet in the solar system."
+          ],
+          finalChapter: [
+            "After concluding its official science mission on March 31, 1997, Pioneer 10 continued to be tracked by NASA's Deep Space Network as its plutonium power sources steadily decayed.",
+            "Its final, very faint signal was received on January 23, 2003, from a distance of 12.2 billion kilometers (more than 82 astronomical units) from Earth. Today, it coasts silently outward into the outer heliosphere and beyond toward the star Aldebaran."
+          ],
+          legacy: [
+            "Affixed to Pioneer 10's antenna struts is a gold-anodized aluminum plaque designed by Carl Sagan, Frank Drake, and Linda Salzman Sagan, depicting human figures and Earth's location relative to 14 pulsars—a quiet record of its origin."
+          ]
+        },
+        factHighlight: {
+          label: "Trailblazer to the Outer Planets",
+          text: "Pioneer 10 survived radiation doses 1,000 times stronger than lethal human levels at Jupiter, providing vital engineering data that allowed NASA to harden the Voyager spacecraft."
+        },
+        specs: {
+          officialName: "Pioneer 10 (Pioneer F)",
+          missionName: "NASA Pioneer Outer Planets Program",
+          destination: "Jupiter Flyby & Solar System Escape Trajectory",
+          launchDate: "March 2, 1972",
+          landingDate: "Jupiter closest approach: December 3, 1973",
+          missionDuration: "30 years, 10 months of signal contact (last signal January 23, 2003)",
+          objective: "Explore the interplanetary medium beyond Mars, investigate the asteroid belt, and study Jupiter and its magnetosphere.",
+          instruments: "Imaging Photopolarimeter, Helium Vector Magnetometer, Quadrispherical Plasma Analyzer, Charged Particle Instrument, Geiger Tube Telescope, Asteroid/Meteoroid Detector.",
+          finalStatus: "Inactive and unpowered; continuing on solar system escape trajectory.",
+          lastLocation: "Outbound trajectory in the direction of the constellation Taurus (last tracked at 82.19 AU in January 2003)."
+        },
+        sources: [
+          {
+            title: "NASA Science Mission Page: Pioneer 10",
+            url: "https://science.nasa.gov/mission/pioneer-10/"
+          },
+          {
+            title: "NASA Image Archive: Pioneer 10 Jupiter & Io (PIA00452)",
+            url: "https://images.nasa.gov/details/PIA00452"
+          }
+        ]
+      },
+
+      {
+        id: "pioneer-11",
+        name: "Pioneer 11",
+        shortName: "Pioneer 11",
+        destination: "deep",
+        destinationLabel: "Deep Space",
+        category: "Jupiter & Saturn Flyby Spacecraft",
+        featured: false,
+        timelineYear: 1973,
+        timelineDate: "April 5, 1973",
+        shortSummary: "Twin to Pioneer 10 that flew past Jupiter and became the first spacecraft to visit Saturn in September 1979, discovering Saturn's F ring and a new moon.",
+        statusCategory: "Inactive & Coasting Outward",
+        currentStatusSummary: "Inactive and unpowered on a solar system escape trajectory toward the constellation Scutum; last communication received November 1995.",
+        heroImage: {
+          url: "https://images-assets.nasa.gov/image/PIA01362/PIA01362~medium.jpg",
+          nasaId: "PIA01362",
+          title: "Saturn and Moon Titan Photographed by Pioneer 11",
+          caption: "Saturn and its largest moon Titan imaged by Pioneer 11 during humanity's first encounter with the ringed planet in September 1979.",
+          credit: "NASA/ARC",
+          sourceUrl: "https://images.nasa.gov/details/PIA01362"
+        },
+        secondaryImage: {
+          url: "https://images-assets.nasa.gov/image/PIA00453/PIA00453~medium.jpg",
+          nasaId: "PIA00453",
+          title: "Jupiter's Polar Regions Imaged by Pioneer 11",
+          caption: "High-latitude view of Jupiter's north polar clouds captured by Pioneer 11 in December 1974.",
+          credit: "NASA/ARC",
+          sourceUrl: "https://images.nasa.gov/details/PIA00453"
+        },
+        chapters: {
+          beginning: [
+            "Built as the flight backup and twin to Pioneer 10, Pioneer 11 was designed so that if Pioneer 10 succeeded at Jupiter, Pioneer 11 could be retargeted on an ambitious trajectory across the solar system to become the first spacecraft to explore Saturn."
+          ],
+          journey: [
+            "Launched on April 5, 1973, Pioneer 11 skimmed just 42,828 kilometers above Jupiter's cloud tops on December 2, 1974—three times closer than Pioneer 10—using Jupiter's immense gravity to slingshot across the solar system toward Saturn.",
+            "On September 1, 1979, Pioneer 11 passed within 21,000 kilometers of Saturn's cloud tops, threading safely through the ring plane."
+          ],
+          mission: [
+            "Pioneer 11 returned the first close-up images of Saturn, measured its magnetic field and internal heat radiation, and observed its largest moon, Titan.",
+            "Like Pioneer 10, it also carried an identical gold-anodized Pioneer plaque."
+          ],
+          discoveries: [
+            "At Saturn, Pioneer 11 discovered two previously unknown moons and a narrow outer ring designated the 'F' ring, while proving that Saturn's magnetic field—unlike Earth's and Jupiter's—is almost perfectly aligned with the planet's rotation axis."
+          ],
+          finalChapter: [
+            "By 1995, Pioneer 11's RTGs could no longer generate enough electricity to power its transmitter and orient its antenna toward Earth. Routine operations ended on September 30, 1995, and the last brief engineering telemetry was received in November 1995."
+          ],
+          legacy: [
+            "By testing a safe corridor through Saturn's ring plane, Pioneer 11 cleared the path for Voyager 1, Voyager 2, and later the Cassini orbiter."
+          ]
+        },
+        factHighlight: {
+          label: "First to Saturn",
+          text: "Pioneer 11 traversed 1.5 billion kilometers between Jupiter and Saturn over nearly five years to execute humanity's first reconnaissance of the ringed planet."
+        },
+        specs: {
+          officialName: "Pioneer 11 (Pioneer G)",
+          missionName: "NASA Pioneer Outer Planets Program",
+          destination: "Jupiter, Saturn & Solar System Escape Trajectory",
+          launchDate: "April 5, 1973",
+          landingDate: "Jupiter flyby: December 2, 1974; Saturn flyby: September 1, 1979",
+          missionDuration: "22 years, 7 months of contact (last signal November 1995)",
+          objective: "Investigate interplanetary space, Jupiter's polar regions, and conduct the first reconnaissance of Saturn.",
+          instruments: "Imaging Photopolarimeter, Helium Vector Magnetometer, Fluxgate Magnetometer, Plasma Analyzer, Charged Particle & Cosmic Ray instruments, Infrared Radiometer.",
+          finalStatus: "Inactive and unpowered; continuing on solar system escape trajectory.",
+          lastLocation: "Outbound trajectory in the direction of the constellation Scutum."
+        },
+        sources: [
+          {
+            title: "NASA Science Mission Page: Pioneer 10 & Pioneer 11",
+            url: "https://science.nasa.gov/mission/pioneer-10/"
+          },
+          {
+            title: "NASA Image Archive: Pioneer 11 Saturn Encounter (PIA01362)",
+            url: "https://images.nasa.gov/details/PIA01362"
+          }
+        ]
+      },
+
+      {
+        id: "near-shoemaker",
+        name: "NEAR Shoemaker",
+        shortName: "NEAR Shoemaker",
+        destination: "deep",
+        destinationLabel: "Deep Space",
+        category: "Asteroid Orbiter & First Asteroid Lander",
+        featured: true,
+        timelineYear: 2001,
+        timelineDate: "February 12, 2001",
+        shortSummary: "The first spacecraft to orbit an asteroid (433 Eros) and achieve the first controlled touchdown on an asteroid's surface, transmitting gamma-ray data from Eros for two weeks.",
+        statusCategory: "Mission Completed & Resting on Asteroid 433 Eros",
+        currentStatusSummary: "Resting intact and inactive on the surface of near-Earth asteroid 433 Eros; final radio contact occurred February 28, 2001.",
+        heroImage: {
+          url: "https://images-assets.nasa.gov/image/PIA03152/PIA03152~medium.jpg",
+          nasaId: "PIA03152",
+          title: "Asteroid 433 Eros Photographed by NEAR Shoemaker",
+          caption: "Mosaic of asteroid 433 Eros captured by NEAR Shoemaker from orbit in 2000, showing the saddle-shaped depression Himeros.",
+          credit: "NASA/JHUAPL",
+          sourceUrl: "https://images.nasa.gov/details/PIA03152"
+        },
+        secondaryImage: {
+          url: "https://images-assets.nasa.gov/image/PIA03149/PIA03149~medium.jpg",
+          nasaId: "PIA03149",
+          title: "NEAR Shoemaker's Final Image During Descent to 433 Eros",
+          caption: "Last image transmitted from just 120 meters above the boulder-covered surface of 433 Eros on February 12, 2001.",
+          credit: "NASA/JHUAPL",
+          sourceUrl: "https://images.nasa.gov/details/PIA03149"
+        },
+        chapters: {
+          beginning: [
+            "Asteroids are rocky remnants left over from the formation of the solar system 4.6 billion years ago. Until the late 1990s, spacecraft had only glimpsed asteroids during brief high-speed flybys.",
+            "Built by the Johns Hopkins Applied Physics Laboratory as the first launch in NASA's Discovery Program, the Near Earth Asteroid Rendezvous (NEAR) spacecraft—later renamed NEAR Shoemaker in honor of planetary geologist Eugene Shoemaker—was designed to enter orbit around a near-Earth asteroid for a full year."
+          ],
+          journey: [
+            "Launched on February 17, 1996, aboard a Delta II rocket, NEAR Shoemaker flew past main-belt asteroid 253 Mathilde in June 1997 before entering orbit around the peanut-shaped asteroid 433 Eros on February 14, 2000."
+          ],
+          mission: [
+            "For a year, NEAR Shoemaker orbited 33-kilometer-long Eros at altitudes as low as 3 kilometers, capturing more than 160,000 images and mapping its gravity field, topography, and elemental composition.",
+            "Although never designed with landing legs, engineers planned a controlled descent at the end of its orbital mission. On February 12, 2001, NEAR Shoemaker fired its thrusters five times to gently touch down on Eros at roughly 1.5 to 1.8 meters per second."
+          ],
+          discoveries: [
+            "NEAR Shoemaker revealed that 433 Eros is a consolidated, heavily cratered primitive body rather than a loose rubble pile, covered in tens of thousands of boulders and fine regolith.",
+            "Remarkably, the spacecraft survived touchdown intact, allowing its Gamma-Ray Spectrometer to collect elemental data directly from the asteroid's surface for two additional weeks."
+          ],
+          finalChapter: [
+            "On February 28, 2001, with its hydrazine fuel exhausted and temperatures plunging in the asteroid's shadow, NASA shut down communications. NEAR Shoemaker remains resting on the edge of the Himeros depression on 433 Eros as the asteroid orbits the Sun."
+          ],
+          legacy: [
+            "NEAR Shoemaker proved that spacecraft could navigate the irregular, weak gravity field of a small asteroid and safely touch down on its surface—paving the way for sample-return missions like OSIRIS-REx."
+          ]
+        },
+        factHighlight: {
+          label: "Unplanned First Landing",
+          text: "Designed solely as an orbiter without landing gear, NEAR Shoemaker became the first spacecraft in history to land on an asteroid on February 12, 2001."
+        },
+        specs: {
+          officialName: "NEAR Shoemaker (Near Earth Asteroid Rendezvous)",
+          missionName: "NASA Discovery Program — NEAR",
+          destination: "Asteroid 433 Eros (via 253 Mathilde flyby)",
+          launchDate: "February 17, 1996",
+          landingDate: "Orbital insertion: February 14, 2000; Surface touchdown: February 12, 2001",
+          missionDuration: "5 years, 11 days (concluded February 28, 2001)",
+          objective: "Rendezvous with and orbit near-Earth asteroid 433 Eros to determine its physical, geological, and elemental properties.",
+          instruments: "Multispectral Imager (MSI), Near-Infrared Spectrometer (NIS), X-Ray/Gamma-Ray Spectrometer (XGRS), NEAR Laser Rangefinder (NLR), Magnetometer.",
+          finalStatus: "Mission completed; resting inactive on the surface of asteroid 433 Eros (last contact February 28, 2001).",
+          lastLocation: "Surface of near-Earth asteroid 433 Eros (near Himeros depression)."
+        },
+        sources: [
+          {
+            title: "NASA Science Mission Page: NEAR Shoemaker",
+            url: "https://science.nasa.gov/mission/near-shoemaker/"
+          },
+          {
+            title: "NASA Image Archive: Asteroid 433 Eros (PIA03152)",
+            url: "https://images.nasa.gov/details/PIA03152"
+          }
+        ]
+      },
+
+      {
+        id: "dawn",
+        name: "Dawn Spacecraft",
+        shortName: "Dawn",
+        destination: "deep",
+        destinationLabel: "Deep Space",
+        category: "Ion-Propelled Dual-Body Orbiter",
+        featured: false,
+        timelineYear: 2018,
+        timelineDate: "November 1, 2018",
+        shortSummary: "Using xenon ion propulsion, Dawn became the first spacecraft to orbit two extraterrestrial bodies—giant protoplanet Vesta and dwarf planet Ceres—where it remains in a planetary-protection orbit.",
+        statusCategory: "Propellant Depleted / Stable Orbit Around Ceres",
+        currentStatusSummary: "Inactive in a stable, long-term orbit around dwarf planet Ceres after exhausting hydrazine attitude-control propellant on October 31 / November 1, 2018.",
+        heroImage: {
+          url: "https://images-assets.nasa.gov/image/PIA21906/PIA21906~medium.jpg",
+          nasaId: "PIA21906",
+          title: "Dwarf Planet Ceres and Occator Crater Imaged by Dawn",
+          caption: "High-resolution view of Ceres captured by Dawn, showing the bright carbonate deposits inside Occator Crater.",
+          credit: "NASA/JPL-Caltech/UCLA/MPS/DLR/IDA",
+          sourceUrl: "https://images.nasa.gov/details/PIA21906"
+        },
+        secondaryImage: {
+          url: "https://images-assets.nasa.gov/image/PIA15678/PIA15678~medium.jpg",
+          nasaId: "PIA15678",
+          title: "Protoplanet Vesta Photographed by Dawn",
+          caption: "Full-globe mosaic of giant asteroid Vesta showing the massive Rheasilvia impact basin at its south pole.",
+          credit: "NASA/JPL-Caltech/UCLA/MPS/DLR/IDA",
+          sourceUrl: "https://images.nasa.gov/details/PIA15678"
+        },
+        chapters: {
+          beginning: [
+            "In the main asteroid belt between Mars and Jupiter lie the two most massive bodies in the region: rocky protoplanet Vesta and icy dwarf planet Ceres. Studying both worlds offered a window into the contrasting building blocks of the early solar system.",
+            "Because conventional chemical rockets could not carry enough fuel to enter orbit around one world, depart, and enter orbit around a second, NASA equipped Dawn with three high-efficiency xenon ion thrusters."
+          ],
+          journey: [
+            "Launched on September 27, 2007, aboard a Delta II Heavy rocket, Dawn spiraled outward using gentle, continuous ion thrust. It orbited Vesta from July 2011 to September 2012, then fired its ion engines again to reach Ceres, entering orbit on March 6, 2015."
+          ],
+          mission: [
+            "Dawn remains the only spacecraft ever to orbit a body in the main asteroid belt and the only spacecraft to orbit two destinations beyond Earth-Moon space, achieving a total velocity change of over 11 kilometers per second via ion propulsion.",
+            "In its final extended mission, Dawn dipped as low as 35 kilometers above Ceres's surface to map the bright deposits in Occator Crater."
+          ],
+          discoveries: [
+            "At Vesta, Dawn confirmed that the world has an iron core, mantle, and basaltic crust—and verified that Vesta is the parent body of the HED meteorites found on Earth.",
+            "At Ceres, Dawn discovered bright sodium carbonate deposits and hydrated salts in Occator Crater, revealing that briny liquid water had recently welled up from a subsurface reservoir."
+          ],
+          finalChapter: [
+            "Dawn used hydrazine thrusters to keep its solar panels and antenna pointed accurately. When its hydrazine supply finally ran out, Dawn missed scheduled communications with NASA's Deep Space Network on October 31 and November 1, 2018.",
+            "In accordance with NASA planetary protection rules—so Dawn would not contaminate Ceres's organic-bearing surface—controllers had placed the spacecraft into a high-pericenter orbit where it will remain silently circling Ceres for at least 20 years and likely decades longer."
+          ],
+          legacy: [
+            "Dawn demonstrated the transformative reach of solar-electric ion propulsion while showing that dwarf planet Ceres is a geologically active ocean-relic world."
+          ]
+        },
+        factHighlight: {
+          label: "Ion Propulsion Record",
+          text: "Dawn's ion engines operated for more than 51,000 hours (nearly 6 years of cumulative thrusting), achieving 2.7 times the velocity change of any previous spacecraft."
+        },
+        specs: {
+          officialName: "Dawn Spacecraft",
+          missionName: "NASA Discovery Program — Dawn",
+          destination: "Protoplanet 4 Vesta & Dwarf Planet 1 Ceres",
+          launchDate: "September 27, 2007",
+          landingDate: "Vesta orbit: July 16, 2011; Ceres orbit: March 6, 2015",
+          missionDuration: "11 years, 1 month (concluded November 1, 2018)",
+          objective: "Characterize the internal structure, density, shape, and composition of Vesta and Ceres to illuminate early solar system evolution.",
+          instruments: "Framing Camera, Visible and Infrared Mapping Spectrometer (VIR), Gamma Ray and Neutron Detector (GRaND), three xenon ion thrusters.",
+          finalStatus: "Propellant depleted; inactive in a stable planetary-protection orbit around dwarf planet Ceres.",
+          lastLocation: "Orbiting dwarf planet Ceres in the main asteroid belt."
+        },
+        sources: [
+          {
+            title: "NASA Science Mission Page: Dawn",
+            url: "https://science.nasa.gov/mission/dawn/"
+          },
+          {
+            title: "NASA Image Archive: Ceres & Occator Crater (PIA21906)",
+            url: "https://images.nasa.gov/details/PIA21906"
+          }
+        ]
+      },
+
+      {
+        id: "kepler",
+        name: "Kepler Space Telescope",
+        shortName: "Kepler",
+        destination: "deep",
+        destinationLabel: "Deep Space",
+        category: "Exoplanet-Hunting Space Observatory",
+        featured: false,
+        timelineYear: 2018,
+        timelineDate: "October 30, 2018",
+        shortSummary: "An Earth-trailing heliocentric space telescope that stared at over 500,000 stars, discovering more than 2,600 confirmed exoplanets and proving that planets outnumber stars in our galaxy.",
+        statusCategory: "Fuel Depleted & Decommissioned in Heliocentric Orbit",
+        currentStatusSummary: "Decommissioned and unpowered in a safe, Earth-trailing orbit around the Sun; final shutdown commands transmitted November 15, 2018.",
+        heroImage: {
+          url: "https://images-assets.nasa.gov/image/PIA18904/PIA18904~medium.jpg",
+          nasaId: "PIA18904",
+          title: "Kepler Space Telescope Photometer Array",
+          caption: "Kepler's 42-CCD photometer array photographed prior to launch, built to measure tiny dips in starlight caused by transiting planets.",
+          credit: "NASA/Ball Aerospace",
+          sourceUrl: "https://images.nasa.gov/details/PIA18904"
+        },
+        secondaryImage: {
+          url: "https://images-assets.nasa.gov/image/PIA19821/PIA19821~medium.jpg",
+          nasaId: "PIA19821",
+          title: "Kepler's Field of View in the Constellations Cygnus and Lyra",
+          caption: "Artist illustration showing Kepler's primary search cone extending into the Orion Arm of the Milky Way.",
+          credit: "NASA/Ames/JPL-Caltech",
+          sourceUrl: "https://images.nasa.gov/details/PIA19821"
+        },
+        chapters: {
+          beginning: [
+            "For centuries, humanity wondered whether planets orbiting other stars were rare anomalies or common across the Milky Way. Detecting small, rocky worlds light-years away required measuring a dimming of starlight as tiny as 1 part in 10,000 when a planet crossed in front of its star.",
+            "Built around a 0.95-meter Schmidt telescope and a 95-megapixel photometer, Kepler was placed not in orbit around Earth—where Earth's glare and gravity would interrupt continuous viewing—but in an Earth-trailing orbit around the Sun."
+          ],
+          journey: [
+            "Launched on March 6, 2009, aboard a Delta II rocket, Kepler entered a 372.5-day heliocentric orbit trailing behind Earth, allowing it to stare uninterrupted at a single patch of sky in the constellations Cygnus and Lyra."
+          ],
+          mission: [
+            "During its four-year primary mission, Kepler continuously monitored the brightness of more than 150,000 main-sequence stars simultaneously.",
+            "When two of its four reaction wheels failed by 2013, engineers devised an ingenious 'K2' extended mission that balanced the spacecraft against the gentle pressure of sunlight using its remaining two wheels and thrusters, allowing Kepler to survey new fields along the ecliptic plane for another four years."
+          ],
+          discoveries: [
+            "Across its primary and K2 missions, Kepler observed 530,506 stars and led to the confirmation of more than 2,600 exoplanets—more than half of all planets known beyond our solar system at the time of its retirement.",
+            "Statistical analysis of Kepler's census revealed a profound truth: there are more planets than stars in our galaxy, and small rocky planets in habitable zones are common."
+          ],
+          finalChapter: [
+            "After nine years in space, Kepler exhausted the hydrazine fuel needed to aim its telescope and point its antenna toward Earth. NASA announced its retirement on October 30, 2018.",
+            "On November 15, 2018—the 388th anniversary of astronomer Johannes Kepler's death—engineers sent final commands disabling its safety modes and shutting down its transmitters. Kepler remains drifting safely in orbit around the Sun, roughly 151 million kilometers from Earth."
+          ],
+          legacy: [
+            "Kepler transformed exoplanet science from hunting individual oddities into galactic demographics, guiding the target lists for NASA's TESS and James Webb Space Telescope."
+          ]
+        },
+        factHighlight: {
+          label: "Galactic Census",
+          text: "Kepler's observations showed that roughly 20 to 50 percent of the stars visible in the night sky are likely to have small, possibly rocky planets similar in size to Earth within their habitable zones."
+        },
+        specs: {
+          officialName: "Kepler Space Telescope",
+          missionName: "NASA Discovery Program — Kepler & K2",
+          destination: "Earth-Trailing Heliocentric Orbit",
+          launchDate: "March 6, 2009",
+          landingDate: "Science operations began: May 12, 2009",
+          missionDuration: "9 years, 7 months (retired October 30, 2018; decommissioned November 15, 2018)",
+          objective: "Survey a sample of stars in the Milky Way to determine the frequency of Earth-size and larger planets in or near the habitable zone.",
+          instruments: "0.95-meter aperture Schmidt telescope, 42-CCD 95-megapixel photometer.",
+          finalStatus: "Decommissioned and unpowered in a safe Earth-trailing solar orbit.",
+          lastLocation: "Heliocentric Earth-trailing orbit, approximately 151 million km (94 million miles) from Earth."
+        },
+        sources: [
+          {
+            title: "NASA Science Mission Page: Kepler Space Telescope",
+            url: "https://science.nasa.gov/mission/kepler/"
+          },
+          {
+            title: "NASA Image Archive: Kepler Photometer Array (PIA18904)",
+            url: "https://images.nasa.gov/details/PIA18904"
+          }
+        ]
+      }
+    ];
+
+    /* ========================================================================
+       4. EXPLORER'S CHALLENGE QUIZ DATA (100% VERIFIED FROM SITE CONTENT)
+       ======================================================================== */
+    const QUIZ_QUESTIONS = [
+      {
+        question: "Why were Apollo Lunar Module descent stages left behind on the Moon?",
+        options: [
+          "They suffered engine failures after touchdown and could not take off.",
+          "They served as solid launch platforms for the returning ascent stages, shedding landing gear and empty tanks.",
+          "Astronauts lacked fuel to undock the two stages in lunar orbit."
+        ],
+        correctIndex: 1,
+        explanation: "The Lunar Module was engineered in two parts. Leaving the descent stage behind as a launch pad allowed the ascent stage to lift off with far less mass and propellant."
+      },
+      {
+        question: "Which Apollo mission landed within 163 meters of the inactive Surveyor 3 lander in November 1969?",
+        options: [
+          "Apollo 11",
+          "Apollo 12",
+          "Apollo 17"
+        ],
+        correctIndex: 1,
+        explanation: "Apollo 12 astronauts Pete Conrad and Alan Bean landed in Oceanus Procellarum beside Surveyor 3 and returned its television camera to Earth for engineering study."
+      },
+      {
+        question: "What event ended NASA's communication with the Opportunity rover in June 2018?",
+        options: [
+          "Its wheels became permanently trapped in soft sand at Gusev Crater.",
+          "A planet-encircling dust storm blocked sunlight from reaching its solar panels.",
+          "Ground controllers accidentally pointed its antenna away from Earth."
+        ],
+        correctIndex: 1,
+        explanation: "A global dust storm engulfed Meridiani Planum in late May/June 2018, cutting off solar power. Opportunity sent its final signal on June 10, 2018, after 5,111 sols."
+      },
+      {
+        question: "How did Ingenuity achieve powered flight in Mars's ultra-thin atmosphere?",
+        options: [
+          "It used miniature solid-fuel rocket boosters for short hops.",
+          "It spun two counter-rotating 1.2-meter carbon-fiber rotors at roughly 2,537 rpm.",
+          "It glided on thermal updrafts after being launched from a catapult on Perseverance."
+        ],
+        correctIndex: 1,
+        explanation: "Because Mars's surface atmosphere is only ~1% as dense as Earth's, Ingenuity used lightweight carbon-fiber blades spinning at ~2,537 rpm to complete 72 flights."
+      },
+      {
+        question: "Which spacecraft became the first to orbit an asteroid and achieve a controlled touchdown on its surface?",
+        options: [
+          "NEAR Shoemaker (at asteroid 433 Eros)",
+          "Pioneer 10 (in the main asteroid belt)",
+          "Dawn (at protoplanet Vesta)"
+        ],
+        correctIndex: 0,
+        explanation: "After orbiting asteroid 433 Eros for a year, NEAR Shoemaker executed a controlled descent and landed on the asteroid on February 12, 2001."
+      },
+      {
+        question: "Where is the decommissioned Kepler Space Telescope located today?",
+        options: [
+          "In low Earth orbit alongside the Hubble Space Telescope",
+          "In an Earth-trailing heliocentric orbit around the Sun",
+          "Resting on the surface of dwarf planet Ceres"
+        ],
+        correctIndex: 1,
+        explanation: "Kepler was placed in an Earth-trailing solar orbit so Earth would not block its view. After exhausting its fuel in 2018, it was decommissioned in that safe orbit."
+      }
+    ];
+
+    /* ========================================================================
+       5. APPLICATION STATE & ROUTING
+       ======================================================================== */
+    const state = {
+      currentView: "home",
+      currentDestination: "moon",
+      currentArtifactId: null,
+      previousView: "explore",
+      timelineFilter: "all",
+      quizIndex: 0,
+      quizScore: 0,
+      quizAnswered: false
+    };
+
+    /* ========================================================================
+       6. IMAGE FALLBACK HANDLER
+       ======================================================================== */
+    window.handleImageError = function(imgEl, assetCode, title, archiveUrl) {
+      if (!imgEl) return;
+      imgEl.style.display = "none";
+      const wrap = imgEl.parentElement;
+      if (!wrap) return;
+      const fallback = wrap.querySelector(".archive-fallback");
+      if (fallback) {
+        fallback.classList.add("visible");
+      }
+    };
+
+    /* ========================================================================
+       7. VIEW NAVIGATION & SCROLL MANAGEMENT
+       ======================================================================== */
+    function switchView(viewName, options = {}) {
+      state.previousView = state.currentView;
+      state.currentView = viewName;
+
+      // Toggle active section
+      document.querySelectorAll(".view-section").forEach(sec => {
+        sec.classList.remove("active");
+      });
+      const targetSec = document.getElementById(`view-${viewName}`);
+      if (targetSec) {
+        targetSec.classList.add("active");
+      }
+
+      // Update active nav link
+      document.querySelectorAll(".nav-link").forEach(link => {
+        const navTarget = link.getAttribute("data-nav");
+        if (navTarget === viewName || (viewName === "story" && navTarget === "explore")) {
+          link.classList.add("active");
+        } else {
+          link.classList.remove("active");
+        }
+      });
+
+      // Header solid background on non-hero views
+      const header = document.getElementById("siteHeader");
+      if (viewName !== "home") {
+        header.classList.add("solid-bg");
+      } else if (window.scrollY < 40) {
+        header.classList.remove("solid-bg");
+      }
+
+      // Close mobile menu if open
+      const navLinks = document.getElementById("navLinks");
+      const mobileBtn = document.getElementById("mobileMenuBtn");
+      navLinks.classList.remove("open");
+      mobileBtn.setAttribute("aria-expanded", "false");
+
+      // View-specific triggers
+      if (viewName === "explore") {
+        const dest = options.destination || state.currentDestination;
+        renderExploreView(dest);
+      } else if (viewName === "story" && options.artifactId) {
+        renderStoryView(options.artifactId);
+      } else if (viewName === "timeline") {
+        renderTimeline(state.timelineFilter);
+      } else if (viewName === "about") {
+        renderQuiz();
+      }
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    /* ========================================================================
+       8. RENDERING: HOME FEATURED ARTIFACTS
+       ======================================================================== */
+    function renderFeaturedArtifacts() {
+      const container = document.getElementById("featuredArtifactsList");
+      if (!container) return;
+
+      const featuredIds = ["lrv", "sojourner", "opportunity", "ingenuity", "pioneer-10", "near-shoemaker"];
+      const featuredItems = featuredIds
+        .map(id => ARTIFACTS.find(a => a.id === id))
+        .filter(Boolean);
+
+      container.innerHTML = featuredItems.map((item, idx) => {
+        const num = String(idx + 1).padStart(2, "0");
+        const tagClass = item.destination === "moon"
+          ? "env-tag-lunar"
+          : item.destination === "mars"
+          ? "env-tag-mars"
+          : "env-tag-deep";
+
+        return `
+          <button type="button" class="featured-row" data-story="${item.id}" aria-label="Read full story of ${item.name}">
+            <span class="featured-index">${num}</span>
+            <div class="featured-thumb">
+              <img
+                src="${item.heroImage.url}"
+                alt="${item.heroImage.title}"
+                loading="lazy"
+                onerror="this.style.display='none'"
+              />
+            </div>
+            <div class="featured-meta">
+              <span class="featured-dest ${tagClass}">${item.destinationLabel} &middot; ${item.timelineYear}</span>
+              <h3 class="featured-name">${item.name}</h3>
+              <p class="featured-summary">${item.shortSummary}</p>
+            </div>
+            <span class="featured-action">Read Story &rarr;</span>
+          </button>
+        `;
+      }).join("");
+    }
+
+    /* ========================================================================
+       9. RENDERING: EXPLORE VIEW (MOON / MARS / DEEP SPACE)
+       ======================================================================== */
+    function renderExploreView(destKey) {
+      state.currentDestination = destKey;
+      const destMeta = DESTINATIONS[destKey];
+      if (!destMeta) return;
+
+      // Update header theme
+      const header = document.getElementById("exploreHeader");
+      header.className = `explore-header ${destMeta.themeClass}`;
+
+      // Update tab states
+      document.querySelectorAll(".dest-tab").forEach(tab => {
+        const isMatch = tab.getAttribute("data-dest") === destKey;
+        tab.classList.toggle("active", isMatch);
+        tab.setAttribute("aria-selected", isMatch ? "true" : "false");
+      });
+
+      // Render destination intro
+      const introBlock = document.getElementById("destIntroBlock");
+      const tagClass = destKey === "moon" ? "env-tag-lunar" : destKey === "mars" ? "env-tag-mars" : "env-tag-deep";
+
+      introBlock.innerHTML = `
+        <div>
+          <span class="mono-label ${tagClass}">${destMeta.label} Archive</span>
+          <h2 class="dest-intro-heading">${destMeta.heading}</h2>
+        </div>
+        <p class="dest-intro-copy">${destMeta.intro}</p>
+      `;
+
+      // Render artifacts for destination
+      const destArtifacts = ARTIFACTS.filter(a => a.destination === destKey);
+      const listEl = document.getElementById("exploreArtifactsList");
+      const statusClass = destKey === "mars" ? "status-mars" : destKey === "deep" ? "status-deep" : "";
+
+      listEl.innerHTML = destArtifacts.map(art => `
+        <article class="artifact-showcase">
+          <figure class="archive-figure artifact-showcase-media">
+            <div class="archive-img-wrap">
+              <img
+                src="${art.heroImage.url}"
+                alt="${art.heroImage.title}"
+                loading="lazy"
+                onerror="handleImageError(this, '${art.heroImage.nasaId}', '${art.heroImage.title.replace(/'/g, "\\'")}', '${art.heroImage.sourceUrl}')"
+              />
+              <div class="archive-fallback">
+                <span class="archive-fallback-code">NASA ARCHIVE ASSET: ${art.heroImage.nasaId}</span>
+                <span class="archive-fallback-title">${art.heroImage.title}</span>
+                <span class="archive-fallback-note">Archival image currently unavailable offline. View record at images.nasa.gov.</span>
+              </div>
+            </div>
+            <figcaption class="archive-caption">
+              <span class="archive-caption-text">${art.heroImage.caption}</span>
+              <span class="archive-caption-credit">
+                <span>Credit: ${art.heroImage.credit}</span>
+                <a href="${art.heroImage.sourceUrl}" target="_blank" rel="noopener noreferrer">NASA ID: ${art.heroImage.nasaId}</a>
+              </span>
+            </figcaption>
+          </figure>
+
+          <div>
+            <span class="artifact-type-badge">${art.category}</span>
+            <h3 class="artifact-showcase-title">${art.name}</h3>
+            <div class="artifact-showcase-mission">${art.specs.missionName} &middot; Launched ${art.specs.launchDate}</div>
+            <p class="artifact-showcase-desc">${art.shortSummary}</p>
+
+            <div class="artifact-status-line ${statusClass}">
+              <strong>Verified Status: ${art.statusCategory}</strong>
+              <span>${art.currentStatusSummary}</span>
+            </div>
+
+            <button type="button" class="btn-primary" data-story="${art.id}">
+              Open 6-Chapter Story
+            </button>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    /* ========================================================================
+       10. RENDERING: INDIVIDUAL ARTIFACT 6-CHAPTER DOCUMENTARY PAGE
+       ======================================================================== */
+    function renderStoryView(artifactId) {
+      const art = ARTIFACTS.find(a => a.id === artifactId);
+      if (!art) return;
+
+      state.currentArtifactId = artifactId;
+      state.currentDestination = art.destination;
+
+      const backBtn = document.getElementById("storyBackBtn");
+      backBtn.textContent = `← Back to ${art.destinationLabel} Archive`;
+      backBtn.onclick = () => switchView("explore", { destination: art.destination });
+
+      // Find next artifact in same destination or overall
+      const currentIndex = ARTIFACTS.findIndex(a => a.id === artifactId);
+      const nextArt = ARTIFACTS[(currentIndex + 1) % ARTIFACTS.length];
+
+      const mount = document.getElementById("storyMount");
+      mount.innerHTML = `
+        <!-- Story Opening Hero -->
+        <header class="story-hero">
+          <div class="container story-hero-grid">
+            <div>
+              <span class="mono-label" style="color: var(--accent-lunar);">${art.destinationLabel} &middot; ${art.category}</span>
+              <h1 class="story-title">${art.name}</h1>
+              <p class="story-subtitle">${art.shortSummary}</p>
+
+              <dl class="story-quick-facts">
+                <div class="quick-fact">
+                  <dt>Mission</dt>
+                  <dd>${art.specs.missionName}</dd>
+                </div>
+                <div class="quick-fact">
+                  <dt>Launch Date</dt>
+                  <dd>${art.specs.launchDate}</dd>
+                </div>
+                <div class="quick-fact">
+                  <dt>Active Duration</dt>
+                  <dd>${art.specs.missionDuration}</dd>
+                </div>
+                <div class="quick-fact">
+                  <dt>Verified Status</dt>
+                  <dd>${art.statusCategory}</dd>
+                </div>
+              </dl>
+            </div>
+
+            <figure class="archive-figure">
+              <div class="archive-img-wrap" style="aspect-ratio: 16/11;">
+                <img
+                  src="${art.heroImage.url}"
+                  alt="${art.heroImage.title}"
+                  onerror="handleImageError(this, '${art.heroImage.nasaId}', '${art.heroImage.title.replace(/'/g, "\\'")}', '${art.heroImage.sourceUrl}')"
+                />
+                <div class="archive-fallback">
+                  <span class="archive-fallback-code">NASA ARCHIVE ASSET: ${art.heroImage.nasaId}</span>
+                  <span class="archive-fallback-title">${art.heroImage.title}</span>
+                  <span class="archive-fallback-note">Archival image unavailable offline. Reference: ${art.heroImage.sourceUrl}</span>
+                </div>
+              </div>
+              <figcaption class="archive-caption">
+                <span class="archive-caption-text">${art.heroImage.caption}</span>
+                <span class="archive-caption-credit">
+                  <span>Credit: ${art.heroImage.credit}</span>
+                  <a href="${art.heroImage.sourceUrl}" target="_blank" rel="noopener noreferrer">NASA Archive ${art.heroImage.nasaId}</a>
+                </span>
+              </figcaption>
+            </figure>
+          </div>
+        </header>
+
+        <!-- Six Documentary Chapters -->
+        <div class="container story-chapters-container">
+          <!-- CHAPTER 01 -->
+          <article class="story-chapter" id="chapter-1">
+            <div class="chapter-sidebar">
+              <span class="chapter-num">Chapter 01</span>
+              <h2 class="chapter-heading">The Beginning</h2>
+            </div>
+            <div class="chapter-body">
+              ${art.chapters.beginning.map(p => `<p>${p}</p>`).join("")}
+            </div>
+          </article>
+
+          <!-- CHAPTER 02 -->
+          <article class="story-chapter" id="chapter-2">
+            <div class="chapter-sidebar">
+              <span class="chapter-num">Chapter 02</span>
+              <h2 class="chapter-heading">The Journey</h2>
+            </div>
+            <div class="chapter-body">
+              ${art.chapters.journey.map(p => `<p>${p}</p>`).join("")}
+            </div>
+          </article>
+
+          <!-- CHAPTER 03 -->
+          <article class="story-chapter" id="chapter-3">
+            <div class="chapter-sidebar">
+              <span class="chapter-num">Chapter 03</span>
+              <h2 class="chapter-heading">The Mission</h2>
+            </div>
+            <div class="chapter-body">
+              ${art.chapters.mission.map(p => `<p>${p}</p>`).join("")}
+
+              <div class="chapter-fact-callout">
+                <span class="mono-label">Mission Highlight &middot; ${art.factHighlight.label}</span>
+                <p>${art.factHighlight.text}</p>
+              </div>
+            </div>
+          </article>
+
+          <!-- CHAPTER 04 -->
+          <article class="story-chapter" id="chapter-4">
+            <div class="chapter-sidebar">
+              <span class="chapter-num">Chapter 04</span>
+              <h2 class="chapter-heading">The Discoveries</h2>
+            </div>
+            <div class="chapter-body">
+              ${art.chapters.discoveries.map(p => `<p>${p}</p>`).join("")}
+
+              ${art.secondaryImage ? `
+                <figure class="archive-figure chapter-figure">
+                  <div class="archive-img-wrap">
+                    <img
+                      src="${art.secondaryImage.url}"
+                      alt="${art.secondaryImage.title}"
+                      loading="lazy"
+                      onerror="handleImageError(this, '${art.secondaryImage.nasaId}', '${art.secondaryImage.title.replace(/'/g, "\\'")}', '${art.secondaryImage.sourceUrl}')"
+                    />
+                    <div class="archive-fallback">
+                      <span class="archive-fallback-code">NASA ARCHIVE ASSET: ${art.secondaryImage.nasaId}</span>
+                      <span class="archive-fallback-title">${art.secondaryImage.title}</span>
+                      <span class="archive-fallback-note">Archival image unavailable offline. Reference: ${art.secondaryImage.sourceUrl}</span>
+                    </div>
+                  </div>
+                  <figcaption class="archive-caption">
+                    <span class="archive-caption-text">${art.secondaryImage.caption}</span>
+                    <span class="archive-caption-credit">
+                      <span>Credit: ${art.secondaryImage.credit}</span>
+                      <a href="${art.secondaryImage.sourceUrl}" target="_blank" rel="noopener noreferrer">NASA Archive ${art.secondaryImage.nasaId}</a>
+                    </span>
+                  </figcaption>
+                </figure>
+              ` : ""}
+            </div>
+          </article>
+
+          <!-- CHAPTER 05 -->
+          <article class="story-chapter" id="chapter-5">
+            <div class="chapter-sidebar">
+              <span class="chapter-num">Chapter 05</span>
+              <h2 class="chapter-heading">The Final Chapter</h2>
+            </div>
+            <div class="chapter-body">
+              ${art.chapters.finalChapter.map(p => `<p>${p}</p>`).join("")}
+            </div>
+          </article>
+
+          <!-- CHAPTER 06 -->
+          <article class="story-chapter" id="chapter-6" style="border-bottom: none; padding-bottom: 0;">
+            <div class="chapter-sidebar">
+              <span class="chapter-num">Chapter 06</span>
+              <h2 class="chapter-heading">The Legacy</h2>
+            </div>
+            <div class="chapter-body">
+              ${art.chapters.legacy.map(p => `<p>${p}</p>`).join("")}
+            </div>
+          </article>
+        </div>
+
+        <!-- Technical Dossier & Verified Sources -->
+        <section class="dossier-section" id="story-dossier" aria-labelledby="dossierHeading">
+          <div class="container">
+            <span class="mono-label">Verified Archival Record</span>
+            <h2 class="section-title" id="dossierHeading" style="margin-bottom:0.5rem;">Technical Dossier &amp; Sources</h2>
+            <p style="color: var(--text-secondary); max-width: 60ch;">
+              Mission parameters and verified operational status compiled from official NASA archives.
+            </p>
+
+            <div class="dossier-grid">
+              <div>
+                <table class="spec-table">
+                  <tbody>
+                    <tr>
+                      <th>Official Name</th>
+                      <td>${art.specs.officialName}</td>
+                    </tr>
+                    <tr>
+                      <th>Mission Name</th>
+                      <td>${art.specs.missionName}</td>
+                    </tr>
+                    <tr>
+                      <th>Destination</th>
+                      <td>${art.specs.destination}</td>
+                    </tr>
+                    <tr>
+                      <th>Launch Date</th>
+                      <td>${art.specs.launchDate}</td>
+                    </tr>
+                    <tr>
+                      <th>Arrival / Landing</th>
+                      <td>${art.specs.landingDate}</td>
+                    </tr>
+                    <tr>
+                      <th>Mission Duration</th>
+                      <td>${art.specs.missionDuration}</td>
+                    </tr>
+                    <tr>
+                      <th>Mission Objective</th>
+                      <td>${art.specs.objective}</td>
+                    </tr>
+                    <tr>
+                      <th>Key Instruments</th>
+                      <td>${art.specs.instruments}</td>
+                    </tr>
+                    <tr>
+                      <th>Operational Status</th>
+                      <td>${art.specs.finalStatus}</td>
+                    </tr>
+                    <tr>
+                      <th>Location / Trajectory</th>
+                      <td>${art.specs.lastLocation}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <aside class="sources-box">
+                <span class="mono-label" style="color: var(--accent-lunar);">Traceable References</span>
+                <h3 style="font-family: var(--font-display); font-size: 1.25rem; margin-top: 0.4rem;">Verified NASA Sources</h3>
+                <ul class="sources-list">
+                  ${art.sources.map(src => `
+                    <li>
+                      <span>${src.title}</span>
+                      <a href="${src.url}" target="_blank" rel="noopener noreferrer">${src.url}</a>
+                    </li>
+                  `).join("")}
+                </ul>
+              </aside>
+            </div>
+
+            <div class="story-next-bar">
+              <button type="button" class="btn-secondary" data-explore-dest="${art.destination}">
+                &larr; All ${art.destinationLabel} Artifacts
+              </button>
+              <button type="button" class="btn-primary" data-story="${nextArt.id}">
+                Next Story: ${nextArt.shortName} &rarr;
+              </button>
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    /* ========================================================================
+       11. RENDERING: CHRONOLOGICAL TIMELINE
+       ======================================================================== */
+    function renderTimeline(filter = "all") {
+      state.timelineFilter = filter;
+      const mount = document.getElementById("timelineMount");
+      if (!mount) return;
+
+      // Update active filter button
+      document.querySelectorAll(".filter-btn").forEach(btn => {
+        btn.classList.toggle("active", btn.getAttribute("data-filter") === filter);
+      });
+
+      const sorted = [...ARTIFACTS]
+        .filter(a => filter === "all" || a.destination === filter)
+        .sort((a, b) => a.timelineYear - b.timelineYear);
+
+      mount.innerHTML = sorted.map(art => {
+        const tagClass = art.destination === "moon"
+          ? "env-tag-lunar"
+          : art.destination === "mars"
+          ? "env-tag-mars"
+          : "env-tag-deep";
+
+        return `
+          <div class="timeline-item">
+            <div class="timeline-date-col">
+              <div class="timeline-year">${art.timelineYear}</div>
+              <div class="timeline-exact-date">${art.timelineDate}</div>
+            </div>
+
+            <article class="timeline-card">
+              <div class="timeline-thumb">
+                <img
+                  src="${art.heroImage.url}"
+                  alt="${art.heroImage.title}"
+                  loading="lazy"
+                  onerror="this.style.display='none'"
+                />
+              </div>
+
+              <div class="timeline-body">
+                <span class="mono-label ${tagClass}">${art.destinationLabel} &middot; ${art.statusCategory}</span>
+                <h3>${art.name}</h3>
+                <p>${art.shortSummary}</p>
+                <button type="button" class="env-link-btn" data-story="${art.id}">
+                  <span>Read Documentary Story</span>
+                  <span aria-hidden="true">&rarr;</span>
+                </button>
+              </div>
+            </article>
+          </div>
+        `;
+      }).join("");
+    }
+
+    /* ========================================================================
+       12. RENDERING: EXPLORER'S CHALLENGE QUIZ (LOCAL IN-BROWSER)
+       ======================================================================== */
+    function renderQuiz() {
+      const container = document.getElementById("quizContainer");
+      if (!container) return;
+
+      if (state.quizIndex >= QUIZ_QUESTIONS.length) {
+        container.innerHTML = `
+          <div>
+            <span class="mono-label" style="color: var(--accent-lunar);">Challenge Complete</span>
+            <h3 class="quiz-question" style="margin-top:0.5rem;">
+              You answered ${state.quizScore} out of ${QUIZ_QUESTIONS.length} questions correctly.
+            </h3>
+            <p style="color: var(--text-secondary); margin-bottom: 1.75rem; max-width: 56ch;">
+              Every question in this self-check is drawn directly from NASA mission records featured in The Silent Explorers. You can retake the challenge or return to the archives to explore more spacecraft stories.
+            </p>
+            <div style="display:flex; flex-wrap:wrap; gap:1rem;">
+              <button type="button" class="btn-primary" id="restartQuizBtn">Retake Challenge</button>
+              <button type="button" class="btn-secondary" data-nav="explore">Return to Archives</button>
+            </div>
+          </div>
+        `;
+
+        document.getElementById("restartQuizBtn").addEventListener("click", () => {
+          state.quizIndex = 0;
+          state.quizScore = 0;
+          state.quizAnswered = false;
+          renderQuiz();
+        });
+        return;
+      }
+
+      const q = QUIZ_QUESTIONS[state.quizIndex];
+      const letters = ["A", "B", "C"];
+
+      container.innerHTML = `
+        <div class="quiz-progress">
+          <span class="mono-label">Question ${state.quizIndex + 1} of ${QUIZ_QUESTIONS.length}</span>
+          <span class="mono-label">Verified Score: ${state.quizScore} / ${QUIZ_QUESTIONS.length}</span>
+        </div>
+
+        <h3 class="quiz-question">${q.question}</h3>
+
+        <div class="quiz-options" id="quizOptions">
+          ${q.options.map((opt, idx) => `
+            <button type="button" class="quiz-option" data-opt-index="${idx}">
+              <span class="mono-label" style="color: var(--accent-lunar);">${letters[idx]}.</span>
+              <span>${opt}</span>
+            </button>
+          `).join("")}
+        </div>
+
+        <div class="quiz-feedback" id="quizFeedback"></div>
+
+        <button type="button" class="btn-primary" id="nextQuestionBtn" style="display:none;">
+          ${state.quizIndex + 1 < QUIZ_QUESTIONS.length ? "Next Question →" : "View Final Score →"}
+        </button>
+      `;
+
+      const optionBtns = container.querySelectorAll(".quiz-option");
+      const feedbackEl = document.getElementById("quizFeedback");
+      const nextBtn = document.getElementById("nextQuestionBtn");
+
+      optionBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+          if (state.quizAnswered) return;
+          state.quizAnswered = true;
+
+          const chosen = Number(btn.getAttribute("data-opt-index"));
+          const isCorrect = chosen === q.correctIndex;
+
+          if (isCorrect) {
+            state.quizScore += 1;
+            btn.classList.add("selected-correct");
+          } else {
+            btn.classList.add("selected-wrong");
+            optionBtns[q.correctIndex].classList.add("selected-correct");
+          }
+
+          optionBtns.forEach(b => (b.disabled = true));
+
+          feedbackEl.innerHTML = `
+            <strong style="color: var(--text-primary); display:block; margin-bottom:0.3rem;">
+              ${isCorrect ? "Correct." : "Not quite."}
+            </strong>
+            <span>${q.explanation}</span>
+          `;
+          feedbackEl.classList.add("visible");
+          nextBtn.style.display = "inline-block";
+        });
+      });
+
+      nextBtn.addEventListener("click", () => {
+        state.quizIndex += 1;
+        state.quizAnswered = false;
+        renderQuiz();
+      });
+    }
+
+    /* ========================================================================
+       13. RENDERING: MASTER SOURCES DIRECTORY
+       ======================================================================== */
+    function renderMasterSources() {
+      const grid = document.getElementById("masterSourcesGrid");
+      if (!grid) return;
+
+      grid.innerHTML = MASTER_SOURCES.map(src => `
+        <div class="source-ref-item">
+          <h4>${src.title}</h4>
+          <a href="${src.url}" target="_blank" rel="noopener noreferrer">${src.url}</a>
+        </div>
+      `).join("");
+    }
+
+    /* ========================================================================
+       14. GLOBAL EVENT DELEGATION & INITIALIZATION
+       ======================================================================== */
+    document.addEventListener("DOMContentLoaded", () => {
+      renderFeaturedArtifacts();
+      renderExploreView("moon");
+      renderTimeline("all");
+      renderMasterSources();
+      renderQuiz();
+
+      // Global click delegation for navigation, destination tabs, and story links
+      document.body.addEventListener("click", (e) => {
+        const navEl = e.target.closest("[data-nav]");
+        if (navEl) {
+          e.preventDefault();
+          const target = navEl.getAttribute("data-nav");
+          switchView(target);
+          return;
+        }
+
+        const exploreDestEl = e.target.closest("[data-explore-dest]");
+        if (exploreDestEl) {
+          e.preventDefault();
+          const dest = exploreDestEl.getAttribute("data-explore-dest");
+          switchView("explore", { destination: dest });
+          return;
+        }
+
+        const destTabEl = e.target.closest(".dest-tab");
+        if (destTabEl) {
+          const dest = destTabEl.getAttribute("data-dest");
+          renderExploreView(dest);
+          return;
+        }
+
+        const storyEl = e.target.closest("[data-story]");
+        if (storyEl) {
+          e.preventDefault();
+          const id = storyEl.getAttribute("data-story");
+          switchView("story", { artifactId: id });
+          return;
+        }
+
+        const filterEl = e.target.closest(".filter-btn");
+        if (filterEl) {
+          const filter = filterEl.getAttribute("data-filter");
+          renderTimeline(filter);
+          return;
+        }
+      });
+
+      // Mobile menu toggle
+      const mobileBtn = document.getElementById("mobileMenuBtn");
+      const navLinks = document.getElementById("navLinks");
+      mobileBtn.addEventListener("click", () => {
+        const isOpen = navLinks.classList.toggle("open");
+        mobileBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+      });
+
+      // Header scroll transition
+      const header = document.getElementById("siteHeader");
+      window.addEventListener("scroll", () => {
+        if (state.currentView !== "home" || window.scrollY > 40) {
+          header.classList.add("scrolled");
+        } else {
+          header.classList.remove("scrolled");
+        }
+      }, { passive: true });
+    });
+  </script>
+</body>
+</html>
